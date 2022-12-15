@@ -5,41 +5,39 @@ import { useState } from "react";
 
 import { Home } from "./home.js";
 
-import logo from "./images/logo.png"
+import logo from "./images/logo.png";
 
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 
 import { Row, Col } from "antd";
-import { message, Form, Input, Button, Checkbox, Avatar} from "antd";
-import {
-  UserOutlined,
-  LockOutlined,
-} from "@ant-design/icons";
+import { message, Form, Input, Button, Checkbox, Avatar, Image } from "antd";
+import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 const Login = (props) => {
   const navigate = useNavigate();
 
-  const onFinish = (values) => {
-    values = { ...values};
+  const login = (values) => {
+    values = { ...values };
 
-    if (values.username === "admin" && values.password === "pass") {
-      navigate("/home");
-    } else {
-      message.warning("Wrong username or password!");
-    }
   };
 
   return (
     <div>
-      <Row>
-        <Col xs={{ span: 5, offset: 1 }} lg={{ span: 6, offset: 2 }}></Col>
-        <Col xs={{ span: 11, offset: 1 }} lg={{ span: 6, offset: 2 }}>
+      <Row align="center">
+        <Col span={8}>
+            <Image
+              preview = {false}
+              width = {"1000px"}
+              src={require("./images/roadless.png")}
+            />
+        </Col>
+        <Col span={8} offset={4}>
           <Form
             name="normal_login"
             className="login-form"
             initialValues={{ remember: true }}
-            onFinish={onFinish}
+            onFinish={login}
           >
             <Avatar
               size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 300 }}
@@ -89,7 +87,7 @@ const Login = (props) => {
             </Form.Item>
           </Form>
         </Col>
-        <Col xs={{ span: 5, offset: 1 }} lg={{ span: 6, offset: 2 }}></Col>
+        <Col span = {6}></Col>
       </Row>
     </div>
   );
