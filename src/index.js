@@ -19,18 +19,17 @@ const Login = (props) => {
 
   const login = (values) => {
     values = { ...values };
-
   };
 
   return (
     <div>
       <Row align="center">
         <Col span={8}>
-            <Image
-              preview = {false}
-              width = {"1000px"}
-              src={require("./images/roadless.png")}
-            />
+          <Image
+            preview={false}
+            width={"1000px"}
+            src={require("./images/roadless.png")}
+          />
         </Col>
         <Col span={8} offset={4}>
           <Form
@@ -87,7 +86,7 @@ const Login = (props) => {
             </Form.Item>
           </Form>
         </Col>
-        <Col span = {6}></Col>
+        <Col span={6}></Col>
       </Row>
     </div>
   );
