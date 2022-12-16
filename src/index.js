@@ -3,6 +3,8 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import { useState } from "react";
 
+import axios from "axios";
+
 import { Home } from "./home.js";
 
 import logo from "./images/logo.png";
@@ -14,11 +16,22 @@ import { Row, Col } from "antd";
 import { message, Form, Input, Button, Checkbox, Avatar, Image } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
+import baseURL from "./baseURL.js";
+const axiosIns = axios.create({ baseURL: baseURL });
+
 const Login = (props) => {
   const navigate = useNavigate();
 
   const login = (values) => {
     values = { ...values };
+    const data = {
+      status: "Success",
+      username: values.username,
+      password: values.password,
+    };
+    axiosIns.post("/login", data).then((res) => {
+      console.log(res.data);
+    });
   };
 
   return (
