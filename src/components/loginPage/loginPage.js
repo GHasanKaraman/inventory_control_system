@@ -1,22 +1,54 @@
 import React from "react";
 import { useState } from "react";
 import { observer } from "mobx-react";
+import { useNavigate } from "react-router-dom";
+import { Row, Col } from "antd";
 
-import axios from "axios";
-
+import baseRequest from "../../core/baseRequest.js";
 import logo from "../../images/logo.png";
 import "../../App.css";
 
-import { useNavigate } from "react-router-dom";
+import {
+  message,
+  Form,
+  Input,
+  Button,
+  Modal,
+  Checkbox,
+  Avatar,
+  Image,
+  Select,
+} from "antd";
 
-import { Row, Col } from "antd";
-import { message, Form, Input, Button, Checkbox, Avatar, Image } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
-import baseRequest from "../../core/baseRequest.js";
+var md5 = require("md5");
 
+const { Option } = Select;
 const loginPage = observer((props) => {
   const navigate = useNavigate();
+
+  const [open, setOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [visible, setVisible] = useState();
+  const [inputVisible, setInputVisible] = useState();
+  const [adminPass, setAdminPass] = useState();
+
+  const [form] = Form.useForm();
+
+  const register = (values) => {
+    setLoading(true);
+    const data = {
+      name: values.name,
+      username: values.username,
+      password: md5(values.password),
+      email: values.email,
+    };
+
+    const res = baseRequest.post("/register", data).then((res) => {
+      console.log(res.data);
+    });
+  };
 
   const login = (values) => {
     values = { ...values };
@@ -35,6 +67,54 @@ const loginPage = observer((props) => {
       }
     });
   };
+
+  const showModal = () => {
+    setInputVisible({ display: "flex" });
+    setVisible({ display: "none" });
+    setAdminPass("");
+    setOpen(true);
+  };
+
+  const hideModal = () => {
+    setOpen(false);
+    if (loading) {
+      setLoading(false);
+    }
+    form.resetFields();
+  };
+
+  const tailFormItemLayout = {
+    wrapperCol: {
+      xs: {
+        span: 24,
+        offset: 0,
+      },
+      sm: {
+        span: 16,
+        offset: 8,
+      },
+    },
+  };
+
+  const formItemLayout = {
+    labelCol: {
+      xs: { span: 24 },
+      sm: { span: 8 },
+    },
+    wrapperCol: {
+      xs: { span: 24 },
+      sm: { span: 16 },
+    },
+  };
+
+  const prefixSelector = (
+    <Form.Item name="prefix" noStyle>
+      <Select style={{ width: 70 }}>
+        <Option value="1">+1</Option>
+        <Option value="90">+90</Option>
+      </Select>
+    </Form.Item>
+  );
 
   return (
     <div>
@@ -85,8 +165,8 @@ const loginPage = observer((props) => {
                 <Checkbox>Remember me</Checkbox>
               </Form.Item>
 
-              <a className="login-form-forgot" href="">
-                Forgot password
+              <a className="login-form-forgot" onClick={showModal}>
+                Create User
               </a>
             </Form.Item>
 
@@ -100,6 +180,127 @@ const loginPage = observer((props) => {
               </Button>
             </Form.Item>
           </Form>
+
+          <Modal onCancel={hideModal} open={open} title="Sign Up" footer={null}>
+            <Input.Password
+              value={adminPass}
+              style={inputVisible}
+              placeholder="Admin Password"
+              prefix={<LockOutlined />}
+              onChange={(e) => {
+                setAdminPass(e.target.value);
+                if (e.target.value == "12345") {
+                  setVisible({ display: "inline" });
+                  setInputVisible({ display: "none" });
+                } else {
+                  setVisible({ display: "none" });
+                }
+              }}
+            />
+            <Form
+              form={form}
+              style={visible}
+              {...formItemLayout}
+              name="register"
+              onFinish={register}
+              initialValues={{
+                prefix: "1",
+              }}
+              scrollToFirstError
+            >
+              <Form.Item
+                name="name"
+                label="Full Name"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your full name!",
+                    whitespace: true,
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                name="username"
+                label="Username"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your username!",
+                    whitespace: true,
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                name="email"
+                label="E-mail"
+                rules={[
+                  {
+                    type: "email",
+                    message: "The input is not valid E-mail!",
+                  },
+                  {
+                    required: true,
+                    message: "Please input your E-mail!",
+                  },
+                ]}
+              >
+                <Input />
+              </Form.Item>
+
+              <Form.Item
+                name="password"
+                label="Password"
+                rules={[
+                  {
+                    required: true,
+                    message: "Please input your password!",
+                  },
+                ]}
+                hasFeedback
+              >
+                <Input.Password />
+              </Form.Item>
+
+              <Form.Item
+                name="confirm"
+                label="Confirm Password"
+                dependencies={["password"]}
+                hasFeedback
+                rules={[
+                  {
+                    required: true,
+                    message: "Please confirm your password!",
+                  },
+                  ({ getFieldValue }) => ({
+                    validator(_, value) {
+                      if (!value || getFieldValue("password") === value) {
+                        return Promise.resolve();
+                      }
+                      return Promise.reject(
+                        new Error(
+                          "The two passwords that you entered do not match!"
+                        )
+                      );
+                    },
+                  }),
+                ]}
+              >
+                <Input.Password />
+              </Form.Item>
+
+              <Form.Item {...tailFormItemLayout}>
+                <Button type="primary" htmlType="submit" loading={loading}>
+                  Register
+                </Button>
+              </Form.Item>
+            </Form>
+          </Modal>
         </Col>
         <Col span={6}></Col>
       </Row>
