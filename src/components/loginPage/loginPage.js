@@ -39,25 +39,34 @@ const loginPage = observer((props) => {
   const register = (values) => {
     setLoading(true);
     const data = {
-      name: values.name,
-      username: values.username,
-      password: md5(values.password),
+      backend: "QWERTY!@#$",
       email: values.email,
+      password: md5(values.password),
+      name:values.name
     };
-
-    const res = baseRequest.post("/register", data).then((res) => {
-      console.log(res.data);
+    baseRequest.post("/register", data).then((res) => {
+      setLoading(false);
+      if (res.data.result == "succes") {
+        console.log("Signed up!");
+        message.info("You have successfully signed up!");
+      } else if (res.data.result == "failed") {
+        message.info("Something went wrong!");
+        hideModal();
+      }
+      else if(res.data.error.code == 11000){
+        message.info("This user is registered in the system!");
+      }
     });
   };
 
   const login = (values) => {
     values = { ...values };
     const data = {
-      status: "Success",
+      backend: "QWERTY!@#$",
       username: values.username,
       password: values.password,
     };
-    const res = baseRequest.post("/login", data).then((res) => {
+    baseRequest.post("/login", data).then((res) => {
       const { perm, username } = res.data;
 
       if (perm == "enter") {
@@ -106,15 +115,6 @@ const loginPage = observer((props) => {
       sm: { span: 16 },
     },
   };
-
-  const prefixSelector = (
-    <Form.Item name="prefix" noStyle>
-      <Select style={{ width: 70 }}>
-        <Option value="1">+1</Option>
-        <Option value="90">+90</Option>
-      </Select>
-    </Form.Item>
-  );
 
   return (
     <div>
@@ -215,20 +215,6 @@ const loginPage = observer((props) => {
                   {
                     required: true,
                     message: "Please input your full name!",
-                    whitespace: true,
-                  },
-                ]}
-              >
-                <Input />
-              </Form.Item>
-
-              <Form.Item
-                name="username"
-                label="Username"
-                rules={[
-                  {
-                    required: true,
-                    message: "Please input your username!",
                     whitespace: true,
                   },
                 ]}
