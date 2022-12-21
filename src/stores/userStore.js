@@ -1,17 +1,28 @@
-import { observable, action } from "mobx";
+import { observable, action, makeObservable } from "mobx";
 import baseRequest from "../core/baseRequest";
 import { b64EncodeUnicode } from "../utils/helpers";
 
 export class UserStore {
-  @observable isLoggedIn = false;
-  @observable name = "";
-  @observable email = "";
+  isLoggedIn = false;
+  name = "";
+  email = "";
 
-  @action changeStatus(isLoggedIn) {
+  constructor() {
+    makeObservable(this, {
+      isLoggedIn: observable,
+      name: observable,
+      email: observable,
+      changeStatus: action,
+      login: action,
+      control: action,
+    });
+  }
+
+  changeStatus(isLoggedIn) {
     this.isLoggedIn = isLoggedIn;
   }
 
-  @action async login(email, password) {
+  async login(email, password) {
     const encoded = b64EncodeUnicode(email + "=" + password);
     await baseRequest.addHeader(encoded);
     const response = await baseRequest.post("/login", null);
@@ -21,15 +32,16 @@ export class UserStore {
       this.name = response.data.resultData.name;
       this.email = response.data.resultData.email;
       this.isLoggedIn = true;
-      localStorage.setItem("user", this.username);
+      localStorage.setItem("user", this.name);
 
       return response.data;
-    } else {
-      return null;
+    }
+    else{
+      return {result:response.data.result}
     }
   }
 
-  @action control() {
+  control() {
     const token = localStorage.getItem("token");
     if (token) {
       baseRequest.addToken(token);
