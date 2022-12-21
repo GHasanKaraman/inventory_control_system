@@ -64,7 +64,7 @@ const loginPage = observer((props) => {
     const res = await userStore.login(values.email, values.password);
     if (res.result === "success") {
       navigate("/home");
-    } else if (response.data.result === "not_found") {
+    } else if (res.result === "not_found") {
       message.error("Your username or password is incorrect!");
     } else {
       message.error("You are not authenticated!");

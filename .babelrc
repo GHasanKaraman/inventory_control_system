@@ -1,7 +1,6 @@
-{   
-"presets": ["@babel/preset-react"],
-"plugins": [["@babel/plugin-proposal-class-properties"]],
-    "assumptions": {
-        "setPublicClassFields": false
-    }
+{
+  "presets": ["@babel/preset-env","react", "es2015"],
+  "plugins": [
+  ["@babel/plugin-proposal-decorators", { "legacy": true }]
+]
 }
