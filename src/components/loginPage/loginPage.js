@@ -7,6 +7,8 @@ import { Row, Col } from "antd";
 import baseRequest from "../../core/baseRequest.js";
 import logo from "../../images/logo.png";
 import "../../App.css";
+import { b64EncodeUnicode } from "../../utils/helpers.js";
+import { useStore } from "../../stores/useStore";
 
 import {
   message,
@@ -27,6 +29,7 @@ var md5 = require("md5");
 const { Option } = Select;
 const loginPage = observer((props) => {
   const navigate = useNavigate();
+  const { userStore } = useStore();
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -36,45 +39,36 @@ const loginPage = observer((props) => {
 
   const [form] = Form.useForm();
 
-  const register = (values) => {
+  const register = async (values) => {
     setLoading(true);
     const data = {
-      backend: "QWERTY!@#$",
       email: values.email,
       password: md5(values.password),
-      name:values.name
+      name: values.name,
     };
     baseRequest.post("/register", data).then((res) => {
       setLoading(false);
-      if (res.data.result == "succes") {
+      if (res.data.result === "succes") {
         console.log("Signed up!");
         message.info("You have successfully signed up!");
-      } else if (res.data.result == "failed") {
-        message.info("Something went wrong!");
+      } else if (res.data.result === "failed") {
+        message.error("Something went wrong!");
         hideModal();
-      }
-      else if(res.data.error.code == 11000){
-        message.info("This user is registered in the system!");
+      } else if (res.data.error.code === 11000) {
+        message.error("This user is registered in the system!");
       }
     });
   };
 
-  const login = (values) => {
-    values = { ...values };
-    const data = {
-      backend: "QWERTY!@#$",
-      username: values.username,
-      password: values.password,
-    };
-    baseRequest.post("/login", data).then((res) => {
-      const { perm, username } = res.data;
-
-      if (perm == "enter") {
-        navigate("/home");
-      } else {
-        message.error("No Enter!!!!");
-      }
-    });
+  const login = async (values) => {
+    const res = await userStore.login(values.email, values.password);
+    if (res.result === "success") {
+      navigate("/home");
+    } else if (response.data.result === "not_found") {
+      message.error("Your username or password is incorrect!");
+    } else {
+      message.error("You are not authenticated!");
+    }
   };
 
   const showModal = () => {
@@ -138,14 +132,17 @@ const loginPage = observer((props) => {
               src={logo}
             />
             <Form.Item
-              name="username"
+              name="email"
               rules={[
-                { required: true, message: "Please input your Username!" },
+                {
+                  required: true,
+                  message: "Please input your e-mail address.!",
+                },
               ]}
             >
               <Input
                 prefix={<UserOutlined className="site-form-item-icon" />}
-                placeholder="Username"
+                placeholder="E-mail"
               />
             </Form.Item>
             <Form.Item
@@ -189,7 +186,7 @@ const loginPage = observer((props) => {
               prefix={<LockOutlined />}
               onChange={(e) => {
                 setAdminPass(e.target.value);
-                if (e.target.value == "12345") {
+                if (e.target.value === "12345") {
                   setVisible({ display: "inline" });
                   setInputVisible({ display: "none" });
                 } else {

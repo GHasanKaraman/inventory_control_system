@@ -4,43 +4,38 @@ import { b64EncodeUnicode } from "../utils/helpers";
 
 export class UserStore {
   @observable isLoggedIn = false;
-  @observable username = "";
+  @observable name = "";
   @observable email = "";
-  @observable phone = "";
 
   @action changeStatus(isLoggedIn) {
     this.isLoggedIn = isLoggedIn;
   }
 
-  @action async login(username, password) {
-    console.log(username, password);
-    const token = b64EncodeUnicode(username + "=" + password);
-    await baseRequest.addHeader(token);
+  @action async login(email, password) {
+    const encoded = b64EncodeUnicode(email + "=" + password);
+    await baseRequest.addHeader(encoded);
     const response = await baseRequest.post("/login", null);
-
-    if (response.data.resultData) {
+    if (response.data.result === "success") {
       localStorage.setItem("token", response.data.token);
-      baseRequest.addTokenToHeader(response.data.token);
-      this.username = response.data.resultData.username;
+      baseRequest.addToken(response.data.token);
+      this.name = response.data.resultData.name;
       this.email = response.data.resultData.email;
-      this.phone = response.data.resultData.phone;
       this.isLoggedIn = true;
       localStorage.setItem("user", this.username);
 
-      return response.data.resultData.username;
+      return response.data;
+    } else {
+      return null;
     }
-
-    return null;
   }
 
   @action control() {
     const token = localStorage.getItem("token");
     if (token) {
-      baseRequest.addTokenToHeader(token);
+      baseRequest.addToken(token);
       return true;
     } else {
       return false;
     }
   }
 }
-

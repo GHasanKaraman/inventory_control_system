@@ -18,17 +18,13 @@ const baseRequest = {
   get: (path, params) => {
     return baseRequest.request("GET", path, params);
   },
-  addHeader: (token) => {
-    const sessiontoken = localStorage.getItem("token");
-    axios.defaults.headers.common["Authorization"] =
-      "Basic " + token || sessiontoken;
+  addHeader: (data) => {
+    axios.defaults.headers.common["Authorization"] = "Header " + data;
   },
-  addTokenToHeader: (token) => {
+  addToken: (token) => {
     const sessiontoken = localStorage.getItem("token");
     axios.defaults.headers.common["Authorization"] = token || sessiontoken;
   },
 };
-
-baseRequest.addHeader();
-baseRequest.addTokenToHeader();
+baseRequest.addToken();
 export default baseRequest;
