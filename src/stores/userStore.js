@@ -32,7 +32,7 @@ export class UserStore {
       this.name = response.data.resultData.name;
       this.email = response.data.resultData.email;
       this.isLoggedIn = true;
-      localStorage.setItem("user", this.name);
+      localStorage.setItem("name", this.name);
 
       return response.data;
     }

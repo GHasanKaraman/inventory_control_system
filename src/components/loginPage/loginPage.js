@@ -1,5 +1,5 @@
 import React from "react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { observer } from "mobx-react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col } from "antd";
@@ -7,7 +7,6 @@ import { Row, Col } from "antd";
 import baseRequest from "../../core/baseRequest.js";
 import logo from "../../images/logo.png";
 import "../../App.css";
-import { b64EncodeUnicode } from "../../utils/helpers.js";
 import { useStore } from "../../stores/useStore";
 
 import {
@@ -19,17 +18,20 @@ import {
   Checkbox,
   Avatar,
   Image,
-  Select,
 } from "antd";
 
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
 
 var md5 = require("md5");
 
-const { Option } = Select;
 const loginPage = observer((props) => {
   const navigate = useNavigate();
   const { userStore } = useStore();
+
+  const [user, setUser] = useState(localStorage.getItem("username") || "");
+  const [checked, setChecked] = useState(
+    localStorage.getItem("remember") || ""
+  );
 
   const [open, setOpen] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -38,6 +40,13 @@ const loginPage = observer((props) => {
   const [adminPass, setAdminPass] = useState();
 
   const [form] = Form.useForm();
+
+  useEffect(() => {
+    const status = userStore.control();
+    if (status) {
+      navigate("/home");
+    }
+  }, []);
 
   const register = async (values) => {
     setLoading(true);
@@ -52,7 +61,7 @@ const loginPage = observer((props) => {
         console.log("Signed up!");
         message.info("You have successfully signed up!");
       } else if (res.data.result === "failed") {
-        message.error("Something went wrong!");
+        message.error("Something went wrong. Try again!");
         hideModal();
       } else if (res.data.error.code === 11000) {
         message.error("This user is registered in the system!");
@@ -61,6 +70,14 @@ const loginPage = observer((props) => {
   };
 
   const login = async (values) => {
+    if (values.remember) {
+      localStorage.setItem("username", values.email);
+      localStorage.setItem("remember", true);
+    } else {
+      localStorage.removeItem("username");
+      localStorage.removeItem("remember");
+    }
+
     const res = await userStore.login(values.email, values.password);
     if (res.result === "success") {
       navigate("/home");
@@ -124,7 +141,7 @@ const loginPage = observer((props) => {
           <Form
             name="normal_login"
             className="login-form"
-            initialValues={{ remember: true }}
+            initialValues={{ email: user, remember: checked }}
             onFinish={login}
           >
             <Avatar
