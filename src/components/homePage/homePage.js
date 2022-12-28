@@ -12,13 +12,11 @@ import {
   Button,
   message,
   Input,
-  Space,
-  Table,
-  Tag,
+  Typography,
 } from "antd";
 import {
-  UploadOutlined,
   UserOutlined,
+  UploadOutlined,
   VideoCameraOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
@@ -28,7 +26,8 @@ import { useStore } from "../../stores/useStore";
 
 import ProductTable from "./tableUtils.js";
 
-const { Header, Content, Sider } = Layout;
+const { Paragraph } = Typography;
+const { Header, Sider } = Layout;
 const { Search } = Input;
 
 const items = [UserOutlined, VideoCameraOutlined, UploadOutlined].map(
@@ -40,9 +39,10 @@ const items = [UserOutlined, VideoCameraOutlined, UploadOutlined].map(
 );
 
 const homepage = observer((props) => {
+  const [user, setUser] = useState();
   const [data, setData] = useState();
   const { userStore } = useStore();
-
+  const [queryData, setQueryData] = useState();
   const navigate = useNavigate();
   useEffect(() => {
     const control = async () => {
@@ -58,12 +58,13 @@ const homepage = observer((props) => {
           message.error("Your session has expired! Please sign in again.");
         } else if (res.data.status === "success") {
           const records = res.data.records;
+          setUser(res.data.user[0]);
           const dataSource = [];
           for (let i = 0; i < Object.keys(records).length; i++) {
             dataSource.push(Object.values(records)[i]);
           }
-
           setData(dataSource);
+          setQueryData(dataSource);
         }
       } else {
         navigate("/login");
@@ -77,6 +78,55 @@ const homepage = observer((props) => {
     localStorage.removeItem("token");
     navigate("/login");
     message.success("You hace successfully logged out!");
+  };
+
+  const searchTable = (query) => {
+    query = query.split(";");
+    let newData = Object.values({ ...data });
+
+    for (let i = 0; i < query.length; i++) {
+      if (query[i][0] === "p") {
+        const key = query[i].slice(2);
+        newData = newData.filter((i) => {
+          return i.parts.toLowerCase().includes(key.toLowerCase());
+        });
+      }
+
+      if (query[i][0] === "c") {
+        let key;
+        if (query[i][1] === "=") {
+          key = query[i].slice(2);
+          newData = newData.filter((i) => {
+            return i.count === key;
+          });
+        } else if (query[i][1] === "<") {
+          if (query[i][2] === "=") {
+            key = query[i].slice(3);
+            newData = newData.filter((i) => {
+              return i.count <= key;
+            });
+          } else {
+            key = query[i].slice(2);
+            newData = newData.filter((i) => {
+              return i.count < key;
+            });
+          }
+        } else if (query[i][1] === ">") {
+          if (query[i][2] === "=") {
+            key = query[i].slice(3);
+            newData = newData.filter((i) => {
+              return i.count >= key;
+            });
+          } else {
+            key = query[i].slice(2);
+            newData = newData.filter((i) => {
+              return i.count > key;
+            });
+          }
+        }
+      }
+    }
+    setQueryData(newData);
   };
 
   return (
@@ -106,7 +156,22 @@ const homepage = observer((props) => {
               mode="inline"
               items={items}
             />
+            <div>
+              <Button
+                type="primary"
+                style={{
+                  position: "absolute",
+                  bottom: 0,
+                  display: "block",
+                  width: "100%",
+                }}
+                icon={<UserOutlined />}
+              >
+                {user ? user.name.split(" ")[0] : ""}
+              </Button>
+            </div>
           </Sider>
+
           <Layout
             className="site-layout"
             style={{
@@ -125,7 +190,12 @@ const homepage = observer((props) => {
                     allowClear
                     enterButton
                     onSearch={(value) => {
-                      console.log(value);
+                      searchTable(value);
+                    }}
+                    onChange={(value) => {
+                      if (value.target.value === "") {
+                        setQueryData(data);
+                      }
                     }}
                     style={{ width: 500, alignContent: "center", marginTop: 5 }}
                   />
@@ -146,20 +216,7 @@ const homepage = observer((props) => {
                 </Col>
               </Row>
             </Header>
-            <Content
-              style={{
-                margin: "24px 16px 0",
-                overflow: "initial",
-              }}
-            >
-              <div
-                style={{
-                  padding: 24,
-                  textAlign: "center",
-                }}
-              ></div>
-              <ProductTable dataSource={data} />
-            </Content>
+            <ProductTable dataSource={queryData} />
           </Layout>
         </Layout>
       </ConfigProvider>

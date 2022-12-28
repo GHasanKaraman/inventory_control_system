@@ -1,8 +1,10 @@
 import { useState, useRef } from "react";
 
-import { Button, Input, Space, Table, Tag } from "antd";
+import { Button, Input, Space, Table, Tag, Layout } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
+
+const { Content } = Layout;
 
 const ProductTable = (props) => {
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -95,8 +97,14 @@ const ProductTable = (props) => {
         }}
       />
     ),
-    onFilter: (value, record) =>
-      record[dataIndex].toString().toLowerCase().includes(value.toLowerCase()),
+    onFilter: (value, record) => {
+      if (record[dataIndex]) {
+        return record[dataIndex]
+          .toString()
+          .toLowerCase()
+          .includes(value.toLowerCase());
+      }
+    },
     onFilterDropdownOpenChange: (visible) => {
       if (visible) {
         setTimeout(() => searchInput.current?.select(), 100);
@@ -153,6 +161,7 @@ const ProductTable = (props) => {
       key: "parts",
       width: "30%",
       ...getColumnSearchProps("parts"),
+      onCell: (record, rowIndex) => {},
     },
     {
       title: "Count",
@@ -218,7 +227,22 @@ const ProductTable = (props) => {
   const [searchText, setSearchText] = useState("");
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
-  return <Table columns={columns} dataSource={props.dataSource} />;
+  return (
+    <Content
+      style={{
+        margin: "24px 16px 0",
+        overflow: "initial",
+      }}
+    >
+      <div
+        style={{
+          padding: 24,
+          textAlign: "center",
+        }}
+      ></div>
+      <Table columns={columns} dataSource={props.dataSource} />
+    </Content>
+  );
 };
 
 export default ProductTable;
