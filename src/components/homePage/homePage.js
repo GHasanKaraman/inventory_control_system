@@ -12,38 +12,40 @@ import {
   Button,
   message,
   Input,
-  Typography,
 } from "antd";
 import {
   UserOutlined,
   UploadOutlined,
-  VideoCameraOutlined,
+  TagsOutlined,
   LogoutOutlined,
 } from "@ant-design/icons";
 
 import baseRequest from "../../core/baseRequest";
 import { useStore } from "../../stores/useStore";
 
-import ProductTable from "./tableUtils.js";
+import { ProductTable } from "./tableUtils.js";
+import LabelsModal from "./labels";
+import ItemsModal from "./items";
+import { Item } from "rc-menu";
 
-const { Paragraph } = Typography;
 const { Header, Sider } = Layout;
 const { Search } = Input;
 
-const items = [UserOutlined, VideoCameraOutlined, UploadOutlined].map(
-  (icon, index) => ({
-    key: String(index + 1),
-    icon: React.createElement(icon),
-    label: ["Inventory", "Add New Item", "Labels"][index],
-  })
-);
+const items = [UploadOutlined, TagsOutlined].map((icon, index) => ({
+  key: String(index + 1),
+  icon: React.createElement(icon),
+  label: ["Add New Item", "Labels"][index],
+}));
 
 const homepage = observer((props) => {
-  const [user, setUser] = useState();
-  const [data, setData] = useState();
   const { userStore } = useStore();
+  const [user, setUser] = useState();
+  const [productData, setProductData] = useState();
   const [queryData, setQueryData] = useState();
+  const [labelsModal, setLabelsModal] = useState(false);
+  const [itemsModal, setItemsModal] = useState(false);
   const navigate = useNavigate();
+
   useEffect(() => {
     const control = async () => {
       const status = userStore.control();
@@ -63,7 +65,7 @@ const homepage = observer((props) => {
           for (let i = 0; i < Object.keys(records).length; i++) {
             dataSource.push(Object.values(records)[i]);
           }
-          setData(dataSource);
+          setProductData(dataSource);
           setQueryData(dataSource);
         }
       } else {
@@ -82,7 +84,7 @@ const homepage = observer((props) => {
 
   const searchTable = (query) => {
     query = query.split(";");
-    let newData = Object.values({ ...data });
+    let newData = Object.values({ ...productData });
 
     for (let i = 0; i < query.length; i++) {
       if (query[i][0] === "p") {
@@ -129,6 +131,19 @@ const homepage = observer((props) => {
     setQueryData(newData);
   };
 
+  const menuSelector = (item) => {
+    if (item.key == "1") {
+      setItemsModal(true);
+    } else if (item.key == "2") {
+      setLabelsModal(true);
+    }
+  };
+
+  const hideModal = () => {
+    setLabelsModal(false);
+    setItemsModal(false);
+  };
+
   return (
     <div>
       <ConfigProvider
@@ -155,7 +170,10 @@ const homepage = observer((props) => {
               theme="dark"
               mode="inline"
               items={items}
+              onClick={(item) => menuSelector(item)}
             />
+            <LabelsModal onCancel={hideModal} open={labelsModal} />
+            <ItemsModal open={itemsModal} onCancel={hideModal} />
             <div>
               <Button
                 type="primary"
@@ -194,7 +212,7 @@ const homepage = observer((props) => {
                     }}
                     onChange={(value) => {
                       if (value.target.value === "") {
-                        setQueryData(data);
+                        setQueryData(productData);
                       }
                     }}
                     style={{ width: 500, alignContent: "center", marginTop: 5 }}

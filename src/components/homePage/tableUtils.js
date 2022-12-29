@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
+import React, { useContext, useEffect } from "react";
 
-import { Button, Input, Space, Table, Tag, Layout } from "antd";
+import { Button, Input, Space, Table, Tag, Layout, Form, Select } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 
 const { Content } = Layout;
+const { Option } = Select;
 
 const ProductTable = (props) => {
   const handleSearch = (selectedKeys, confirm, dataIndex) => {
@@ -245,4 +247,116 @@ const ProductTable = (props) => {
   );
 };
 
-export default ProductTable;
+//======================================================
+//Editable Table Components
+//======================================================
+
+const colors = [
+  "magenta",
+  "red",
+  "volcano",
+  "orange",
+  "gold",
+  "lime",
+  "green",
+  "cyan",
+  "blue",
+  "geekblue",
+  "purple",
+  "black",
+];
+
+const EditableContext = React.createContext(null);
+
+const EditableRow = ({ index, ...props }) => {
+  const [form] = Form.useForm();
+  return (
+    <Form form={form} component={false}>
+      <EditableContext.Provider value={form}>
+        <tr {...props} />
+      </EditableContext.Provider>
+    </Form>
+  );
+};
+const EditableCell = ({
+  title,
+  editable,
+  children,
+  dataIndex,
+  record,
+  handleSave,
+  type,
+  ...restProps
+}) => {
+  const [editing, setEditing] = useState(false);
+  const inputRef = useRef(null);
+  const form = useContext(EditableContext);
+  useEffect(() => {
+    if (editing) {
+      inputRef.current.focus();
+    }
+  }, [editing]);
+  const toggleEdit = () => {
+    setEditing(!editing);
+    form.setFieldsValue({
+      [dataIndex]: record[dataIndex],
+    });
+  };
+  const save = async () => {
+    try {
+      const values = await form.validateFields();
+      toggleEdit();
+      handleSave({
+        ...record,
+        ...values,
+      });
+    } catch (errInfo) {
+      console.log("Save failed:", errInfo);
+    }
+  };
+  let childNode = children;
+  if (editable) {
+    childNode = editing ? (
+      <Form.Item
+        style={{
+          margin: 0,
+        }}
+        name={dataIndex}
+        rules={[
+          {
+            required: true,
+            message: `${title} is required.`,
+          },
+        ]}
+      >
+        {type === "input" ? (
+          <Input ref={inputRef} onPressEnter={save} onBlur={save} />
+        ) : (
+          <Select
+            ref={inputRef}
+            onPressEnter={save}
+            onBlur={save}
+            showSearch={true}
+          >
+            {colors.map((color) => {
+              return (
+                <Option key={color} value={color}>
+                  <Tag color={color}>
+                    <p style={{ height: 8 }}>{color}</p>
+                  </Tag>
+                </Option>
+              );
+            })}
+          </Select>
+        )}
+      </Form.Item>
+    ) : (
+      <div className="editable-cell-value-wrap" onClick={toggleEdit}>
+        {children}
+      </div>
+    );
+  }
+  return <td {...restProps}>{childNode}</td>;
+};
+
+export { ProductTable, EditableRow, EditableCell };
