@@ -7,6 +7,8 @@ const userModel = require("./models/user");
 const tokenModel = require("./models/token");
 const productModel = require("./models/product");
 const labelModel = require("./models/label");
+const technicianModel = require("./models/technician");
+const technicianLogModel = require("./models/technicianLog");
 
 const uuid = require("uuid");
 const md5 = require("md5");
@@ -112,10 +114,18 @@ db.once("open", function () {
   app.use(async (req, res, next) => {
     if (
       req.url == "/home" ||
+      "/home/update" ||
+      "/home/delete" ||
+      "/home/give" ||
       "/labels" ||
       "/labels/add" ||
       "/labels/delete" ||
-      "/labels/update"
+      "/labels/update" ||
+      "/items" ||
+      "/technician" ||
+      "/technician/add" ||
+      "/technician/delete" ||
+      "/technician/update"
     ) {
       try {
         const token = req.header("Authorization");
@@ -138,12 +148,17 @@ db.once("open", function () {
               res.json({ status: "token_expired" });
             } else {
               const user = await userModel.find({ _id: tokenData[0].userID });
-              req.user = user;
-              next();
-              console.log(
-                "\x1b[32m%s\x1b[0m",
-                user[0].name + " has been succesfully authenticated!"
-              );
+              if (user) {
+                req.user = user;
+                console.log(
+                  "\x1b[32m%s\x1b[0m",
+                  user[0].name + " has been succesfully authenticated!"
+                );
+                next();
+              } else {
+                console.log("\x1b[31m%s\x1b[0m", "User not found!");
+                res.json({ status: "user_not_found" });
+              }
             }
           } else {
             console.log(
@@ -171,12 +186,136 @@ db.once("open", function () {
 
   app.post("/home", async (req, res) => {
     console.log("Request to loading table...");
-    const products = await productModel.find({}, { _id: 0 });
+    const products = await productModel.find({}, {});
     res.json({
       status: "success",
       records: { ...products },
       user: { ...req.user },
     });
+  });
+
+  app.post("/home/delete", async (req, res) => {
+    try {
+      const id = req.body.id;
+      if (id) {
+        const result = await productModel.deleteOne({ _id: id });
+        if (result.deletedCount != 0) {
+          res.json({ status: "success" });
+          console.log("\x1b[32m%s\x1b[0m", "Item deleted!");
+        } else {
+          res.json({ status: "failed" });
+          console.log(
+            "\x1b[31m%s\x1b[0m",
+            "Didn't find the item for deletion. ID of the item is " + id
+          );
+        }
+      } else {
+        console.log(
+          "\x1b[31m%s\x1b[0m",
+          "Didn't get the reguest for deletion!"
+        );
+        res.json({ status: "request_error" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
+    }
+  });
+
+  app.post("/home/update", async (req, res) => {
+    try {
+      let {
+        id,
+        count,
+        fishbowl,
+        from_where,
+        min_quantity,
+        new_location,
+        parts,
+        price,
+        tags,
+      } = req.body;
+
+      let temp = "";
+      tags.forEach((element) => {
+        temp += element + ",";
+      });
+      tags = temp.substring(0, temp.length - 1);
+
+      if (id) {
+        const result = await productModel.updateOne(
+          { _id: id },
+          {
+            count,
+            fishbowl,
+            from_where,
+            min_quantity,
+            new_location,
+            parts,
+            price: "$" + Number(price).toFixed(2),
+            tags,
+            total_price: "$" + (price * count).toFixed(2),
+          }
+        );
+        if (result.modifiedCount != 0) {
+          console.log("\x1b[32m%s\x1b[0m", "Item updated!");
+          res.json({ status: "success" });
+        } else {
+          res.json({ status: "failed" });
+
+          console.log(
+            "\x1b[31m%s\x1b[0m",
+            req.user[0].name +
+              " didn't update the item. ID of the item is " +
+              id
+          );
+        }
+      } else {
+        console.log(
+          "\x1b[31m%s\x1b[0m",
+          "Didn't get the reguest for updating!"
+        );
+        res.json({ status: "request_error" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
+    }
+  });
+
+  app.post("/home/give", async (req, res) => {
+    try {
+      const { id, count, parts, technician, wanted_count, price } = req.body;
+      const result = await technicianLogModel.create({
+        itemID: id,
+        userID: req.user[0]._id,
+        count,
+        parts,
+        technician,
+        wanted_count,
+      });
+      if (result._id) {
+        const productResult = await productModel.updateOne(
+          { _id: id },
+          {
+            count: count - wanted_count,
+            total_price:
+              "$" +
+              (count * Number(price.substring(1).split(",")[0])).toFixed(2),
+          }
+        );
+
+        res.json(
+          result._id
+            ? { result: "success", resultData: result }
+            : { result: "failed" }
+        );
+        console.log();
+      }
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
   });
 
   app.post("/labels", async (req, res) => {
@@ -249,15 +388,155 @@ db.once("open", function () {
           { _id: _id },
           { name: name.toUpperCase(), color: color }
         );
-
         if (result.modifiedCount != 0) {
           console.log("\x1b[32m%s\x1b[0m", "Label updated!");
           res.json({ status: "success" });
         } else {
-          es.json({ status: "failed" });
+          res.json({ status: "failed" });
+
           console.log(
             "\x1b[31m%s\x1b[0m",
-            "Didn't find the label for update. ID of the label is " + id
+            req.user[0].name +
+              " didn't update the label. ID of the label is " +
+              _id
+          );
+        }
+      } else {
+        console.log(
+          "\x1b[31m%s\x1b[0m",
+          "Didn't get the reguest for updating!"
+        );
+        res.json({ status: "request_error" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
+    }
+  });
+
+  app.post("/items", async (req, res) => {
+    try {
+      let {
+        count,
+        fishbowl,
+        from_where,
+        min_quantity,
+        new_location,
+        parts,
+        price,
+        tags,
+      } = req.body;
+
+      let temp = "";
+      tags.forEach((element) => {
+        temp += element + ",";
+      });
+      tags = temp.substring(0, temp.length - 1);
+      const result = await productModel.create({
+        count,
+        fishbowl,
+        from_where,
+        min_quantity,
+        new_location,
+        parts,
+        price: "$" + Number(price).toFixed(2),
+        tags,
+        total_price: "$" + (price * count).toFixed(2),
+      });
+
+      if (result._id) {
+        console.log(req.user[0].name + " added " + parts + " product!");
+        res.json({ result: "success", resultData: result });
+      } else {
+        res.json({ result: "failed" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
+    }
+  });
+
+  app.post("/technician", async (req, res) => {
+    let techs = await technicianModel.find({});
+    if (techs) {
+      res.json({
+        status: "success",
+        records: { ...techs },
+      });
+      console.log("Retrieved technicians!");
+    } else {
+      res.json({ status: "failed" });
+      console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve technicians!");
+    }
+  });
+
+  app.post("/technician/add", async (req, res) => {
+    try {
+      const { name } = req.body;
+      const result = await technicianModel.create({
+        name: name.toUpperCase(),
+      });
+      res.json(
+        result._id
+          ? { result: "success", resultData: result }
+          : { result: "failed" }
+      );
+      console.log("Technician " + name + " is written in the database");
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
+  });
+
+  app.post("/technician/delete", async (req, res) => {
+    try {
+      const id = req.body.id;
+      if (id) {
+        const result = await technicianModel.deleteOne({ _id: id });
+        if (result.deletedCount != 0) {
+          res.json({ status: "success" });
+          console.log("\x1b[32m%s\x1b[0m", "Technician deleted!");
+        } else {
+          res.json({ status: "failed" });
+          console.log(
+            "\x1b[31m%s\x1b[0m",
+            "Didn't find the technician for deletion. ID of the technician is " +
+              id
+          );
+        }
+      } else {
+        console.log(
+          "\x1b[31m%s\x1b[0m",
+          "Didn't get the reguest for deletion!"
+        );
+        res.json({ status: "request_error" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
+    }
+  });
+
+  app.post("/technician/update", async (req, res) => {
+    try {
+      const { _id, name } = req.body;
+
+      if (_id) {
+        const result = await technicianModel.updateOne(
+          { _id: _id },
+          { name: name.toUpperCase() }
+        );
+        if (result.modifiedCount != 0) {
+          console.log("\x1b[32m%s\x1b[0m", "Technician updated!");
+          res.json({ status: "success" });
+        } else {
+          res.json({ status: "failed" });
+
+          console.log(
+            "\x1b[31m%s\x1b[0m",
+            req.user[0].name +
+              " didn't update the technician. ID of the technician is " +
+              _id
           );
         }
       } else {

@@ -1,9 +1,22 @@
 import { useState, useRef } from "react";
 import React, { useContext, useEffect } from "react";
 
-import { Button, Input, Space, Table, Tag, Layout, Form, Select } from "antd";
+import {
+  Button,
+  Input,
+  Space,
+  Table,
+  Tag,
+  Layout,
+  Form,
+  Select,
+  Popconfirm,
+  message,
+} from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
+
+import baseRequest from "../../core/baseRequest";
 
 const { Content } = Layout;
 const { Option } = Select;
@@ -134,11 +147,15 @@ const ProductTable = (props) => {
         {tags != null ? (
           tags.split(",").map((tag) => {
             tag = tag.trim().toLowerCase();
-            let color = "green";
-            if (tag === "belt") color = "geekblue";
-            if (tag == "roasting") color = "black";
-            if (tag == "resistance") color = "magenta";
-            if (tag == "ntag") color = "volcano";
+            let color = "";
+            if (tag === "ntag") {
+              color = "gray";
+            } else {
+              const result = props.tagColors.filter(
+                (item) => item.name.toUpperCase() === tag.toUpperCase()
+              )[0];
+              color = result ? result.color : "green";
+            }
             return (
               <div>
                 <Tag color={color} key={tag}>
@@ -161,7 +178,7 @@ const ProductTable = (props) => {
       title: "Parts",
       dataIndex: "parts",
       key: "parts",
-      width: "30%",
+      width: "25%",
       ...getColumnSearchProps("parts"),
       onCell: (record, rowIndex) => {},
     },
@@ -169,61 +186,111 @@ const ProductTable = (props) => {
       title: "Count",
       dataIndex: "count",
       key: "count",
-      width: "20%",
+      width: "10%",
       ...getColumnSearchProps("count"),
+      sorter: (a, b) => a.count - b.count,
+      sortDirections: ["descend", "ascend"],
     },
     {
       title: "Price",
       dataIndex: "price",
       key: "price",
       ...getColumnSearchProps("price"),
-      sorter: (a, b) => a.price.length - b.price.length,
+      sorter: (a, b) => {
+        if (a.price && b.price) {
+          a = a.price.substring(1);
+          a = a.split(",");
+          a = a[0] + "." + a[1];
+          a = Number(a);
+          b = b.price.substring(1);
+          b = b.split(",");
+          b = b[0] + "." + b[1];
+          b = Number(b);
+          return a - b;
+        }
+      },
       sortDirections: ["descend", "ascend"],
     },
     {
       title: "Total Price",
       dataIndex: "total_price",
       key: "total_price",
-      width: "20%",
+      width: "10%",
       ...getColumnSearchProps("total_price"),
     },
     {
       title: "From Where",
       dataIndex: "from_where",
       key: "from_where",
-      width: "20%",
+      width: "15%",
       ...getColumnSearchProps("from_where"),
     },
     {
       title: "Min Quantity",
       dataIndex: "min_quantity",
       key: "min_quantity",
-      width: "20%",
+      width: "10%",
       ...getColumnSearchProps("min_quantity"),
     },
     {
       title: "New Location",
       dataIndex: "new_location",
       key: "new_location",
-      width: "20%",
+      width: "11%",
       ...getColumnSearchProps("new_location"),
     },
     {
       title: "Fishbowl",
       dataIndex: "fishbowl",
       key: "fishbowl",
-      width: "20%",
+      width: "1%",
       ...getColumnSearchProps("fishbowl"),
     },
     {
       title: "Tags",
       dataIndex: "tags",
       key: "tags",
-      width: "20%",
+      width: "5%",
       ...getColumnSearchProps("tags"),
       render: (tags) => {
         return tagRenderer(tags);
       },
+    },
+    {
+      title: "Actions",
+      dataIndex: "actions",
+      key: "actions",
+      width: "15%",
+      render: (_, record) =>
+        props.dataSource.length >= 1 ? (
+          <Space size="middle">
+            <Button
+              type="primary"
+              onClick={(event) => {
+                event.stopPropagation();
+                props.onGive(record);
+              }}
+            >
+              Give
+            </Button>
+            <Popconfirm
+              title="Sure to delete?"
+              onCancel={(event) => event.stopPropagation()}
+              onConfirm={(event) => {
+                event.stopPropagation();
+                props.onDelete(record._id);
+              }}
+            >
+              <Button
+                danger
+                type="link"
+                onClick={(event) => event.stopPropagation()}
+              >
+                Delete
+              </Button>
+            </Popconfirm>
+          </Space>
+        ) : null,
     },
   ];
   const [searchText, setSearchText] = useState("");
@@ -242,7 +309,11 @@ const ProductTable = (props) => {
           textAlign: "center",
         }}
       ></div>
-      <Table columns={columns} dataSource={props.dataSource} />
+      <Table
+        columns={columns}
+        dataSource={props.dataSource}
+        onRow={props.onRow}
+      />
     </Content>
   );
 };

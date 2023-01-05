@@ -17,30 +17,13 @@ import {
 import baseRequest from "../../core/baseRequest";
 
 import { EditableCell, EditableRow } from "./tableUtils";
-
-const { Option } = Select;
 const { Content } = Layout;
 
-const colors = [
-  "magenta",
-  "red",
-  "volcano",
-  "orange",
-  "gold",
-  "lime",
-  "green",
-  "cyan",
-  "blue",
-  "geekblue",
-  "purple",
-  "black",
-];
-
-const LabelsModal = (props) => {
+const TechnicianModal = (props) => {
   const [data, setData] = useState();
 
-  const get_labels = async () => {
-    const res = await baseRequest.post("/labels", {});
+  const get_technicians = async () => {
+    const res = await baseRequest.post("/technician", {});
     if (res.data.status === "success") {
       const records = res.data.records;
       const dataSource = [];
@@ -55,55 +38,43 @@ const LabelsModal = (props) => {
 
   useEffect(() => {
     if (props.open) {
-      get_labels();
+      get_technicians();
     }
   }, [props.open]);
 
-  const addLabel = async (values) => {
-    const res = await baseRequest.post("/labels/add", values);
-    if (res.data.error_code) {
+  const addTechnician = async (values) => {
+    const res = await baseRequest.post("/technician/add", values);
+    if (res.data.error) {
       if (res.data.error.code === 11000) {
-        message.error("This label already exists!");
+        message.error("This technician already exists!");
       }
     } else {
-      console.log(res.data);
-      message.success(
-        res.data.resultData.name + " label is successfully created!"
-      );
+      message.success(res.data.resultData.name + " is successfully created!");
 
       form.resetFields();
-      get_labels();
+      get_technicians();
     }
   };
   const [form] = Form.useForm();
 
   const handleDelete = async (id) => {
-    const res = await baseRequest.post("/labels/delete", { id: id });
+    const res = await baseRequest.post("/technician/delete", { id: id });
     if (res.data.status === "success") {
-      message.success("Label has been successfully deleted!");
-      get_labels();
+      message.success("Technician has been successfully deleted!");
+      get_technicians();
     } else if (res.data.status === "failed") {
-      message.error("Didn't delete the label!");
+      message.error("Didn't delete the technician!");
     } else {
       message.error("Server didn't get the request properly!");
     }
   };
   const defaultColumns = [
     {
-      title: "Tag Name",
+      title: "Technician Name",
       dataIndex: "name",
-      width: "30%",
-     editable: true,
-      type: "input",
-    },
-    {
-      title: "Color",
-      dataIndex: "color",
-      render: (label) => {
-        return <Tag color={label}>{label}</Tag>;
-      },
+      width: "70%",
       editable: true,
-      type: "select",
+      type: "input",
     },
     {
       title: "Action",
@@ -120,10 +91,10 @@ const LabelsModal = (props) => {
     },
   ];
   const handleSave = async (row) => {
-    const res = await baseRequest.post("/labels/update", row);
+    const res = await baseRequest.post("/technician/update", row);
     if (res.data.status === "success") {
       message.success("Label has been successfully updated!");
-      get_labels();
+      get_technicians();
     } else if (res.data.status === "failed") {
       message.error("Didn't update the label!");
     } else {
@@ -163,7 +134,7 @@ const LabelsModal = (props) => {
       }}
       footer={null}
       open={props.open}
-      title="Labels"
+      title="Technicians"
     >
       <Space direction="vertical" align="center" size="large">
         <Row>
@@ -171,49 +142,21 @@ const LabelsModal = (props) => {
             name="horizontal_login"
             form={form}
             layout="inline"
-            onFinish={addLabel}
+            onFinish={addTechnician}
           >
             <Form.Item
-              name="label"
+              name="name"
               rules={[
-                { required: true, message: "Please input a new label name!" },
+                { required: true, message: "Please input a technician name!" },
               ]}
             >
-              <Input placeholder="Label" />
+              <Input placeholder="Technician" />
             </Form.Item>
-            <Form.Item
-              name="color"
-              rules={[{ required: true, message: "Please pick a color!" }]}
-            >
-              <Select
-                placeholder="Color"
-                allowClear
-                style={{
-                  textAlign: "center",
-                  width: 150,
-                }}
-              >
-                {colors.map((color) => {
-                  return (
-                    <Option
-                      key={color}
-                      value={color}
-                      style={{ textAlign: "center" }}
-                    >
-                      <Tag color={color} style={{ width: 75 }}>
-                        <p style={{ textAlign: "center", height: 8 }}>
-                          {color}
-                        </p>
-                      </Tag>
-                    </Option>
-                  );
-                })}
-              </Select>
-            </Form.Item>
+
             <Form.Item shouldUpdate>
               {() => (
                 <Button type="primary" htmlType="submit">
-                  Add Label
+                  Add Technician
                 </Button>
               )}
             </Form.Item>
@@ -241,4 +184,4 @@ const LabelsModal = (props) => {
   );
 };
 
-export default LabelsModal;
+export default TechnicianModal;
