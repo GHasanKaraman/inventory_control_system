@@ -130,24 +130,14 @@ const loginPage = observer((props) => {
   return (
     <div>
       <Row align="center">
-        <Col span={8}>
-          <Image
-            preview={false}
-            width={"1000px"}
-            src={require("../../images/roadless.png")}
-          />
-        </Col>
-        <Col span={8} offset={4}>
+        <Col xs={{ span: 20, offset: 2 }} xl={{ span: 8, offset: 4 }} lg={{span:8, offset:4}} md={{span:10}}>
           <Form
             name="normal_login"
             className="login-form"
             initialValues={{ email: user, remember: checked }}
             onFinish={login}
           >
-            <Avatar
-              size={{ xs: 24, sm: 32, md: 40, lg: 64, xl: 80, xxl: 300 }}
-              src={logo}
-            />
+            <Avatar size={{ xs: 300, sm:300,md:300,lg:300, xl: 300, xxl: 300 }} src={logo} />
             <Form.Item
               name="email"
               rules={[
@@ -302,7 +292,6 @@ const loginPage = observer((props) => {
             </Form>
           </Modal>
         </Col>
-        <Col span={6}></Col>
       </Row>
     </div>
   );

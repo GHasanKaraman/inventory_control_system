@@ -29,8 +29,16 @@ const GiveModal = (props) => {
   };
 
   const onFinish = async (values) => {
+    values.price = values.price.substring(1);
+    console.log(values);
     const res = await baseRequest.post("/home/give", values);
     console.log(res.data);
+    if (res.data.result === "success") {
+      message.success("You can give the items!");
+      props.form.resetFields();
+    } else if (res.data.status === "failed") {
+      message.error("Something went wrong while giving the item!");
+    }
   };
 
   return (

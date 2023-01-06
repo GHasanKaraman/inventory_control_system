@@ -93,7 +93,7 @@ const LabelsModal = (props) => {
       title: "Tag Name",
       dataIndex: "name",
       width: "30%",
-     editable: true,
+      editable: true,
       type: "input",
     },
     {
@@ -156,7 +156,6 @@ const LabelsModal = (props) => {
 
   return (
     <Modal
-      width={700}
       onCancel={() => {
         props.onCancel();
         form.resetFields();
@@ -166,14 +165,22 @@ const LabelsModal = (props) => {
       title="Labels"
     >
       <Space direction="vertical" align="center" size="large">
-        <Row>
+        <Row justify={"start"}>
           <Form
+            wrapperCol={{
+              xxl: { span: 15, offset: 8 },
+              xs: { span: 24, offset: 0 },
+            }}
             name="horizontal_login"
             form={form}
             layout="inline"
             onFinish={addLabel}
           >
             <Form.Item
+              wrapperCol={{
+                xxl: { span: 22, offset: 2 },
+                xs: { span: 18, offset: 6 },
+              }}
               name="label"
               rules={[
                 { required: true, message: "Please input a new label name!" },
@@ -182,6 +189,10 @@ const LabelsModal = (props) => {
               <Input placeholder="Label" />
             </Form.Item>
             <Form.Item
+              wrapperCol={{
+                xxl: { span: 18, offset: 1 },
+                xs: { span: 0, offset: 5 },
+              }}
               name="color"
               rules={[{ required: true, message: "Please pick a color!" }]}
             >
@@ -190,7 +201,7 @@ const LabelsModal = (props) => {
                 allowClear
                 style={{
                   textAlign: "center",
-                  width: 150,
+                  width: "200%",
                 }}
               >
                 {colors.map((color) => {
@@ -210,7 +221,13 @@ const LabelsModal = (props) => {
                 })}
               </Select>
             </Form.Item>
-            <Form.Item shouldUpdate>
+            <Form.Item
+              shouldUpdate
+              wrapperCol={{
+                xxl: { span: 2, offset: 12 },
+                xs: { span: 2, offset: 24 },
+              }}
+            >
               {() => (
                 <Button type="primary" htmlType="submit">
                   Add Label
@@ -220,14 +237,8 @@ const LabelsModal = (props) => {
           </Form>
         </Row>
         <Row>
-          <Content
-            style={{
-              margin: "0px 12px 0",
-              overflow: "initial",
-            }}
-          >
+          <Content>
             <Table
-              style={{ width: 600 }}
               components={components}
               rowClassName={() => "editable-row"}
               bordered

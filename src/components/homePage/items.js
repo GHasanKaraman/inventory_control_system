@@ -20,8 +20,7 @@ const tagRender = (props) => {
     event.preventDefault();
     event.stopPropagation();
   };
-  return (
-options.filter((item)=>item.name===value).length != 0?
+  return options.filter((item) => item.name === value).length != 0 ? (
     <Tag
       color={options.filter((item) => item.name === value)[0].color}
       onMouseDown={onPreventMouseDown}
@@ -32,8 +31,8 @@ options.filter((item)=>item.name===value).length != 0?
       }}
     >
       {value}
-    </Tag>:undefined
-  );
+    </Tag>
+  ) : undefined;
 };
 
 const ItemsModal = (props) => {
@@ -97,14 +96,18 @@ const ItemsModal = (props) => {
                   if (!value) {
                     reject("Please enter the count of the item!");
                   }
+                  if (value.includes(".")) {
+                    reject("Please enter an integer!");
+                  }
                   if (!isNaN(value)) {
+                    value = Number(value);
                     if (value < 0) {
                       reject("Please enter a number greater than 0");
                     } else {
                       resolve();
                     }
                   } else {
-                    reject("Please enter a number!");
+                    reject("Enter an number!");
                   }
                 });
               },
@@ -122,8 +125,24 @@ const ItemsModal = (props) => {
                   if (!value) {
                     reject("Please enter the price of the item!");
                   }
-                  if (!isNaN(value)) {
-                    if (value < 0) {
+                  if (value.includes(".")) {
+                    reject("Dot symbol is not accepted!");
+                  }
+                  value = value.split(",")
+                  console.log(value)
+                  if(value.length > 2){
+                    reject("Please enter the number properly!")
+                  }
+                  if (!isNaN(value[0])) {
+                    if(value.length == 2){
+                      if(isNaN(value[1])){
+                        reject("Please enter a number!")
+                      }
+                      if(value[1]==""){
+                        reject("Please enter a number!")
+                      }
+                    }
+                    if (value[0] < 0) {
                       reject("Please enter a price greater than 0");
                     } else {
                       resolve();
@@ -158,6 +177,9 @@ const ItemsModal = (props) => {
                 return new Promise((resolve, reject) => {
                   if (!value) {
                     reject("Please enter min quantity!");
+                  }
+                  if(value.includes(".")){
+                    reject("Please enter an integer!")
                   }
                   if (!isNaN(value)) {
                     if (value < 0) {

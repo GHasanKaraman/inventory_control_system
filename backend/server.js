@@ -12,6 +12,7 @@ const technicianLogModel = require("./models/technicianLog");
 
 const uuid = require("uuid");
 const md5 = require("md5");
+const essentials = require("./utils/essentials");
 
 require("dotenv").config();
 
@@ -125,7 +126,8 @@ db.once("open", function () {
       "/technician" ||
       "/technician/add" ||
       "/technician/delete" ||
-      "/technician/update"
+      "/technician/update" ||
+      "/logs"
     ) {
       try {
         const token = req.header("Authorization");
@@ -242,6 +244,8 @@ db.once("open", function () {
       });
       tags = temp.substring(0, temp.length - 1);
 
+      price = essentials.numberFormatToEU(price);
+
       if (id) {
         const result = await productModel.updateOne(
           { _id: id },
@@ -252,9 +256,9 @@ db.once("open", function () {
             min_quantity,
             new_location,
             parts,
-            price: "$" + Number(price).toFixed(2),
+            price: price.toFixed(2),
             tags,
-            total_price: "$" + (price * count).toFixed(2),
+            total_price: (price * count).toFixed(2),
           }
         );
         if (result.modifiedCount != 0) {
@@ -285,7 +289,8 @@ db.once("open", function () {
 
   app.post("/home/give", async (req, res) => {
     try {
-      const { id, count, parts, technician, wanted_count, price } = req.body;
+      let { id, count, parts, technician, wanted_count, price } = req.body;
+      price = essentials.numberFormatToEU(price);
       const result = await technicianLogModel.create({
         itemID: id,
         userID: req.user[0]._id,
@@ -299,18 +304,27 @@ db.once("open", function () {
           { _id: id },
           {
             count: count - wanted_count,
-            total_price:
-              "$" +
-              (count * Number(price.substring(1).split(",")[0])).toFixed(2),
+            total_price: ((count - wanted_count) * price).toFixed(2),
           }
         );
 
         res.json(
-          result._id
+          result._id && productResult.modifiedCount != 0
             ? { result: "success", resultData: result }
             : { result: "failed" }
         );
-        console.log();
+        console.log(
+          req.user[0].name +
+            " gave " +
+            wanted_count +
+            " out of " +
+            count +
+            " " +
+            parts +
+            " to " +
+            technician +
+            "!"
+        );
       }
     } catch (e) {
       console.log(e);
@@ -432,6 +446,9 @@ db.once("open", function () {
         temp += element + ",";
       });
       tags = temp.substring(0, temp.length - 1);
+
+      price = essentials.numberFormatToEU(price);
+
       const result = await productModel.create({
         count,
         fishbowl,
@@ -439,9 +456,9 @@ db.once("open", function () {
         min_quantity,
         new_location,
         parts,
-        price: "$" + Number(price).toFixed(2),
+        price: price.toFixed(2),
         tags,
-        total_price: "$" + (price * count).toFixed(2),
+        total_price: (price * count).toFixed(2),
       });
 
       if (result._id) {
@@ -549,6 +566,26 @@ db.once("open", function () {
     } catch (e) {
       res.json({ error: e });
       console.log(e);
+    }
+  });
+
+  app.post("/logs", async (req, res) => {
+    let logs = await technicianLogModel.find({});
+    if (logs) {
+      let users = await userModel.find({});
+      if (users) {
+        res.json({
+          status: "success",
+          records: { logs: logs, users: users },
+        });
+        console.log("Retrieved logs!");
+      } else {
+        res.json({ status: "failed" });
+        console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve infos!");
+      }
+    } else {
+      res.json({ status: "failed" });
+      console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve logs!");
     }
   });
 

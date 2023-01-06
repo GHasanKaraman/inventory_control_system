@@ -297,24 +297,11 @@ const ProductTable = (props) => {
   const [searchedColumn, setSearchedColumn] = useState("");
   const searchInput = useRef(null);
   return (
-    <Content
-      style={{
-        margin: "24px 16px 0",
-        overflow: "initial",
-      }}
-    >
-      <div
-        style={{
-          padding: 24,
-          textAlign: "center",
-        }}
-      ></div>
-      <Table
-        columns={columns}
-        dataSource={props.dataSource}
-        onRow={props.onRow}
-      />
-    </Content>
+    <Table
+      columns={columns}
+      dataSource={props.dataSource}
+      onRow={props.onRow}
+    />
   );
 };
 

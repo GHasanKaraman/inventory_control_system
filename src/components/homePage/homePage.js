@@ -13,6 +13,7 @@ import {
   message,
   Input,
   Form,
+  Typography,
 } from "antd";
 import {
   UserOutlined,
@@ -31,29 +32,38 @@ import LabelsModal from "./labels";
 import ItemsModal from "./items";
 import GiveModal from "./give";
 import TechnicianModal from "./technician";
+import LogModal from "./logs";
 
-const { Header, Sider } = Layout;
+const { Header, Sider, Content } = Layout;
 const { Search } = Input;
 
-const items = [UploadOutlined, TagsOutlined, ToolFilled, BookFilled].map(
-  (icon, index) => ({
-    key: String(index + 1),
-    icon: React.createElement(icon),
-    label: ["Add New Item", "Labels", "Add Technician", "Technician Logs"][
-      index
-    ],
-  })
-);
+const items = [
+  UploadOutlined,
+  TagsOutlined,
+  ToolFilled,
+  BookFilled,
+  LogoutOutlined,
+].map((icon, index) => ({
+  key: String(index + 1),
+  icon: React.createElement(icon),
+  label: [
+    "Add New Item",
+    "Labels",
+    "Add Technician",
+    "Technician Logs",
+    "Log Out",
+  ][index],
+}));
 
 const homepage = observer((props) => {
   const { userStore } = useStore();
 
-  const [user, _] = useState();
+  const [user, setUser] = useState();
   const [id, setID] = useState();
   const [productData, setProductData] = useState();
-  const [queryData, setQueryData] = useState();
   const [colorData, setColorData] = useState();
 
+  const [logModal, setLogModal] = useState(false);
   const [labelsModal, setLabelsModal] = useState(false);
   const [registerModal, setRegisterModal] = useState(false);
   const [updateModal, setUpdateModal] = useState(false);
@@ -71,11 +81,11 @@ const homepage = observer((props) => {
     const records = res.data.records;
     const dataSource = [];
     for (let i = 0; i < Object.keys(records).length; i++) {
-      records[i].parts = records[i].parts.toUpperCase();
+      records[i].price = "$" + records[i].price.replace(".", ",");
+      records[i].total_price = "$" + records[i].total_price.replace(".", ",");
       dataSource.push(Object.values(records)[i]);
     }
     setProductData(dataSource);
-    setQueryData(dataSource);
   };
 
   const loadHomePage = async () => {
@@ -91,6 +101,7 @@ const homepage = observer((props) => {
         message.error("Your session has expired! Please sign in again.");
       } else if (res.data.status === "success") {
         await get_products(res);
+        setUser(res.data.user[0]);
       }
     } else {
       navigate("/login");
@@ -141,55 +152,6 @@ const homepage = observer((props) => {
     message.success("You hace successfully logged out!");
   };
 
-  const searchTable = (query) => {
-    query = query.split(";");
-    let newData = Object.values({ ...productData });
-
-    for (let i = 0; i < query.length; i++) {
-      if (query[i][0] === "p") {
-        const key = query[i].slice(2);
-        newData = newData.filter((i) => {
-          return i.parts.toLowerCase().includes(key.toLowerCase());
-        });
-      }
-
-      if (query[i][0] === "c") {
-        let key;
-        if (query[i][1] === "=") {
-          key = query[i].slice(2);
-          newData = newData.filter((i) => {
-            return i.count === key;
-          });
-        } else if (query[i][1] === "<") {
-          if (query[i][2] === "=") {
-            key = query[i].slice(3);
-            newData = newData.filter((i) => {
-              return i.count <= key;
-            });
-          } else {
-            key = query[i].slice(2);
-            newData = newData.filter((i) => {
-              return i.count < key;
-            });
-          }
-        } else if (query[i][1] === ">") {
-          if (query[i][2] === "=") {
-            key = query[i].slice(3);
-            newData = newData.filter((i) => {
-              return i.count >= key;
-            });
-          } else {
-            key = query[i].slice(2);
-            newData = newData.filter((i) => {
-              return i.count > key;
-            });
-          }
-        }
-      }
-    }
-    setQueryData(newData);
-  };
-
   const menuSelector = (item) => {
     if (item.key == "1") {
       setRegisterModal(true);
@@ -197,6 +159,10 @@ const homepage = observer((props) => {
       setLabelsModal(true);
     } else if (item.key == "3") {
       setTechnicianModal(true);
+    } else if (item.key == "4") {
+      setLogModal(true);
+    } else if (item.key == "5") {
+      logout();
     }
   };
 
@@ -218,6 +184,10 @@ const homepage = observer((props) => {
     if (technicianModal) {
       setTechnicianModal(false);
     }
+    if (logModal) {
+      setLogModal(false);
+    }
+    get_products();
   };
   const addItem = async (values) => {
     let {
@@ -270,7 +240,7 @@ const homepage = observer((props) => {
   };
 
   return (
-    <div>
+    <Layout style={{ width: "100%" }}>
       <ConfigProvider
         theme={{
           token: {
@@ -279,19 +249,9 @@ const homepage = observer((props) => {
           },
         }}
       >
-        <Layout hasSider>
-          <Sider
-            style={{
-              overflow: "auto",
-              height: "100vh",
-              position: "fixed",
-              left: 0,
-              top: 0,
-              bottom: 0,
-            }}
-          >
+        <Layout style={{ height: "100%" }}>
+          <Sider>
             <Menu
-              defaultSelectedKeys={["1"]}
               theme="dark"
               mode="inline"
               items={items}
@@ -321,94 +281,50 @@ const homepage = observer((props) => {
               form={giveForm}
             />
             <TechnicianModal open={technicianModal} onCancel={hideModal} />
-            <div>
-              <Button
-                type="primary"
-                style={{
-                  position: "absolute",
-                  bottom: 0,
-                  display: "block",
-                  width: "100%",
-                }}
-                icon={<UserOutlined />}
-              >
-                {user ? user.name.split(" ")[0] : ""}
-              </Button>
-            </div>
+            <LogModal open={logModal} onCancel={hideModal} />
           </Sider>
 
-          <Layout
-            className="site-layout"
-            style={{
-              marginLeft: 200,
-            }}
-          >
-            <Header
-              style={{
-                padding: 10,
-              }}
-            >
-              <Row>
-                <Col span={8} offset={8}>
-                  <Search
-                    placeholder="Search"
-                    allowClear
-                    enterButton
-                    onSearch={(value) => {
-                      searchTable(value);
-                    }}
-                    onChange={(value) => {
-                      if (value.target.value === "") {
-                        setQueryData(productData);
-                      }
-                    }}
-                    style={{ width: 500, alignContent: "center", marginTop: 5 }}
-                  />
-                </Col>
-                <Col span={2} offset={6}>
-                  <Button
-                    type="primary"
-                    icon={<LogoutOutlined />}
-                    style={{
-                      verticalAlign: "top",
-                      marginLeft: 30,
-                      marginTop: 5,
-                    }}
-                    onClick={logout}
-                  >
-                    Log Out
-                  </Button>
-                </Col>
-              </Row>
-            </Header>
-            <ProductTable
-              dataSource={queryData}
-              tagColors={colorData}
-              onDelete={handleDelete}
-              onGive={handleGive}
-              onRow={(record, _) => {
-                return {
-                  onClick: async () => {
-                    updateForm.setFieldsValue({
-                      parts: record.parts,
-                      count: record.count,
-                      price: record.price.substring(1),
-                      from_where: record.from_where,
-                      min_quantity: record.min_quantity,
-                      new_location: record.new_location,
-                      fishbowl: record.fishbowl,
-                      tags: record.tags.split(","),
-                    });
-                    setID(record._id);
-                    setUpdateModal(true);
-                  },
-                };
-              }}
-            />
+          <Layout style={{ padding: "0 24px 24px", width: "400%" }}>
+            <Content>
+              <div
+                style={{
+                  padding: 24,
+                  textAlign: "center",
+                }}
+              >
+                <Typography.Title style={{ color: "#227C70" }} level={4}>
+                  {user ? user.name.split(" ")[0] : ""}
+                </Typography.Title>
+              </div>
+              <ProductTable
+                dataSource={productData}
+                tagColors={colorData}
+                onDelete={handleDelete}
+                onGive={handleGive}
+                onRow={(record, _) => {
+                  return {
+                    onClick: async () => {
+                      updateForm.setFieldsValue({
+                        parts: record.parts,
+                        count: String(record.count),
+                        price: record.price.substring(1),
+                        from_where: record.from_where,
+                        min_quantity: record.min_quantity,
+                        new_location: record.new_location,
+                        fishbowl: record.fishbowl,
+                        tags: record.tags.split(","),
+                      });
+                      setID(record._id);
+                      setUpdateModal(true);
+                    },
+                  };
+                }}
+              />
+            </Content>
           </Layout>
         </Layout>
       </ConfigProvider>
-    </div>
+    </Layout>
   );
 });
 
