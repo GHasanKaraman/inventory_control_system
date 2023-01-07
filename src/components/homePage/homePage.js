@@ -296,30 +296,32 @@ const homepage = observer((props) => {
                   {user ? user.name.split(" ")[0] : ""}
                 </Typography.Title>
               </div>
-              <ProductTable
-                dataSource={productData}
-                tagColors={colorData}
-                onDelete={handleDelete}
-                onGive={handleGive}
-                onRow={(record, _) => {
-                  return {
-                    onClick: async () => {
-                      updateForm.setFieldsValue({
-                        parts: record.parts,
-                        count: String(record.count),
-                        price: record.price.substring(1),
-                        from_where: record.from_where,
-                        min_quantity: record.min_quantity,
-                        new_location: record.new_location,
-                        fishbowl: record.fishbowl,
-                        tags: record.tags.split(","),
-                      });
-                      setID(record._id);
-                      setUpdateModal(true);
-                    },
-                  };
-                }}
-              />
+              {colorData ? (
+                <ProductTable
+                  dataSource={productData}
+                  tagColors={colorData}
+                  onDelete={handleDelete}
+                  onGive={handleGive}
+                  onRow={(record, _) => {
+                    return {
+                      onClick: async () => {
+                        updateForm.setFieldsValue({
+                          parts: record.parts,
+                          count: String(record.count),
+                          price: record.price.substring(1),
+                          from_where: record.from_where,
+                          min_quantity: record.min_quantity,
+                          new_location: record.new_location,
+                          fishbowl: record.fishbowl,
+                          tags: record.tags.split(","),
+                        });
+                        setID(record._id);
+                        setUpdateModal(true);
+                      },
+                    };
+                  }}
+                />
+              ) : null}
             </Content>
           </Layout>
         </Layout>
