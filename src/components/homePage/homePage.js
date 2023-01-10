@@ -17,8 +17,15 @@ import { useStore } from "../../stores/useStore";
 
 import ModalRouter from "../../modals/modalRouter";
 
-import { ProductTable } from "../../modals/tableUtils";
-import { get_products, handleDelete, get_colors } from "./homeController";
+import { ProductTable } from "../tableUtils";
+import {
+  get_products,
+  handleDelete,
+  get_colors,
+  print_qr,
+} from "./homeController";
+import { QRGenerator } from "../../utils/qrGenerator";
+import { PDFGenerator } from "../../utils/pdfGenerator";
 
 const { Sider, Content } = Layout;
 
@@ -138,12 +145,15 @@ const homepage = observer(() => {
                   textAlign: "center",
                 }}
               >
+                <PDFGenerator />
+
                 <Typography.Title style={{ color: "#227C70" }} level={4}>
                   {user ? user.name.split(" ")[0] : ""}
                 </Typography.Title>
               </div>
               {colorData ? (
                 <ProductTable
+                  onPrint={print_qr}
                   dataSource={data}
                   tagColors={colorData}
                   onDelete={handleDelete}

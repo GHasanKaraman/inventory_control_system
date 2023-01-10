@@ -18,7 +18,7 @@ import {
   handleSave,
 } from "./techniciansController";
 
-import { EditableCell, EditableRow } from "../tableUtils";
+import { EditableCell, EditableRow } from "../../components/tableUtils";
 
 const { Content } = Layout;
 

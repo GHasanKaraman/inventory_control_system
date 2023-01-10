@@ -9,6 +9,7 @@ import {
   Form,
   Select,
   Popconfirm,
+  Dropdown,
 } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
@@ -258,15 +259,51 @@ const ProductTable = (props) => {
       render: (_, record) =>
         props.dataSource.length >= 1 ? (
           <Space size="middle">
-            <Button
-              type="primary"
-              onClick={(event) => {
-                event.stopPropagation();
-                props.onGive(record);
+            <Dropdown
+              style={{ contentAlign: "center" }}
+              trigger={["click"]}
+              menu={{
+                items: [
+                  {
+                    key: 1,
+                    label: (
+                      <Button
+                        type="primary"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          props.onPrint(record);
+                        }}
+                      >
+                        Print
+                      </Button>
+                    ),
+                  },
+                  {
+                    key: 2,
+                    label: (
+                      <Button
+                        type="primary"
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          props.onGive(record);
+                        }}
+                      >
+                        Give
+                      </Button>
+                    ),
+                  },
+                ],
               }}
             >
-              Give
-            </Button>
+              <Button
+                type="primary"
+                onClick={(event) => {
+                  event.stopPropagation();
+                }}
+              >
+                More
+              </Button>
+            </Dropdown>
             <Popconfirm
               title="Sure to delete?"
               onCancel={(event) => event.stopPropagation()}

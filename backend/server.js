@@ -118,6 +118,7 @@ db.once("open", function () {
       "/home/update" ||
       "/home/delete" ||
       "/home/give" ||
+      "/home/print" ||
       "/labels" ||
       "/labels/add" ||
       "/labels/delete" ||
@@ -334,6 +335,10 @@ db.once("open", function () {
       console.log(e);
       res.json({ error: e });
     }
+  });
+
+  app.post("/home/print", async (req, res) => {
+    const data = req.body;
   });
 
   app.post("/labels", async (req, res) => {

@@ -20,7 +20,7 @@ import {
   handleSave,
 } from "./labelsController";
 
-import { EditableCell, EditableRow } from "../tableUtils";
+import { EditableCell, EditableRow } from "../../components/tableUtils";
 
 const { Option } = Select;
 const { Content } = Layout;
