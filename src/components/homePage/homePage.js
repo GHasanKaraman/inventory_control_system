@@ -3,20 +3,8 @@ import { useState, useEffect } from "react";
 import { observer } from "mobx-react";
 import { useNavigate } from "react-router-dom";
 
+import { ConfigProvider, Layout, Menu, message, Form, Typography } from "antd";
 import {
-  Row,
-  Col,
-  ConfigProvider,
-  Layout,
-  Menu,
-  Button,
-  message,
-  Input,
-  Form,
-  Typography,
-} from "antd";
-import {
-  UserOutlined,
   UploadOutlined,
   TagsOutlined,
   LogoutOutlined,
@@ -27,15 +15,11 @@ import {
 import baseRequest from "../../core/baseRequest";
 import { useStore } from "../../stores/useStore";
 
-import { ProductTable } from "./tableUtils.js";
-import LabelsModal from "./labels";
-import ItemsModal from "./items";
-import GiveModal from "./give";
-import TechnicianModal from "./technician";
-import LogModal from "./logs";
+import ModalRouter from "../../modals/modalRouter";
 
-const { Header, Sider, Content } = Layout;
-const { Search } = Input;
+import { ProductTable } from "../../modals/tableUtils";
+
+const { Sider, Content } = Layout;
 
 const items = [
   UploadOutlined,
@@ -44,7 +28,7 @@ const items = [
   BookFilled,
   LogoutOutlined,
 ].map((icon, index) => ({
-  key: String(index + 1),
+  key: index + 1,
   icon: React.createElement(icon),
   label: [
     "Add New Item",
@@ -55,26 +39,17 @@ const items = [
   ][index],
 }));
 
-const homepage = observer((props) => {
+const homepage = observer(() => {
   const { userStore } = useStore();
 
+  const [selectedModal, setSelectedModal] = useState();
+
   const [user, setUser] = useState();
-  const [id, setID] = useState();
   const [productData, setProductData] = useState();
+
   const [colorData, setColorData] = useState();
 
-  const [logModal, setLogModal] = useState(false);
-  const [labelsModal, setLabelsModal] = useState(false);
-  const [registerModal, setRegisterModal] = useState(false);
-  const [updateModal, setUpdateModal] = useState(false);
-  const [giveModal, setGiveModal] = useState(false);
-  const [technicianModal, setTechnicianModal] = useState(false);
-
   const navigate = useNavigate();
-
-  const [registerForm] = Form.useForm();
-  const [updateForm] = Form.useForm();
-  const [giveForm] = Form.useForm();
 
   const get_products = async (response) => {
     const res = response ? response : await baseRequest.post("/home", {});
@@ -99,6 +74,10 @@ const homepage = observer((props) => {
         localStorage.removeItem("token");
         navigate("/login");
         message.error("Your session has expired! Please sign in again.");
+      } else if (res.data.status === "user_not_found") {
+        localStorage.removeItem("token");
+        navigate("/login");
+        message.error("Your session has expired! Please sign in again.");
       } else if (res.data.status === "success") {
         await get_products(res);
         setUser(res.data.user[0]);
@@ -110,13 +89,15 @@ const homepage = observer((props) => {
   };
 
   const handleGive = (record) => {
-    giveForm.setFieldsValue({
-      parts: record.parts,
-      count: record.count,
-      id: record._id,
-      price: record.price,
+    setSelectedModal({
+      key: 5,
+      product: {
+        parts: record.parts,
+        count: record.count,
+        id: record._id,
+        price: record.price,
+      },
     });
-    setGiveModal(true);
   };
 
   const handleDelete = async (id) => {
@@ -136,7 +117,7 @@ const homepage = observer((props) => {
 
     if (res.data.status === "success") {
       setColorData(Object.values(res.data.records));
-    } else {
+    } else if (res.data.status === "failed") {
       message.error("Colors have not been retrieved!");
     }
   };
@@ -146,98 +127,9 @@ const homepage = observer((props) => {
     loadHomePage();
   }, []);
 
-  const logout = async () => {
-    localStorage.removeItem("token");
-    navigate("/login");
-    message.success("You hace successfully logged out!");
-  };
-
-  const menuSelector = (item) => {
-    if (item.key == "1") {
-      setRegisterModal(true);
-    } else if (item.key == "2") {
-      setLabelsModal(true);
-    } else if (item.key == "3") {
-      setTechnicianModal(true);
-    } else if (item.key == "4") {
-      setLogModal(true);
-    } else if (item.key == "5") {
-      logout();
-    }
-  };
-
-  const hideModal = async () => {
-    if (labelsModal) {
-      setLabelsModal(false);
-    }
-    if (registerModal) {
-      setRegisterModal(false);
-      await get_products();
-    }
-    if (updateModal) {
-      setUpdateModal(false);
-    }
-    if (giveModal) {
-      setGiveModal(false);
-      giveForm.resetFields();
-    }
-    if (technicianModal) {
-      setTechnicianModal(false);
-    }
-    if (logModal) {
-      setLogModal(false);
-    }
-    get_products();
-  };
-  const addItem = async (values) => {
-    let {
-      count,
-      fishbowl,
-      from_where,
-      min_quantity,
-      new_location,
-      parts,
-      price,
-      tags,
-    } = values;
-
-    parts = parts.toUpperCase();
-    from_where = from_where.toUpperCase();
-    new_location = new_location.toUpperCase();
-    fishbowl = fishbowl.toUpperCase();
-    tags = tags.length == 0 ? "NTAG" : tags;
-
-    const response = await baseRequest.post("/items", {
-      count,
-      fishbowl,
-      from_where,
-      min_quantity,
-      new_location,
-      parts,
-      price,
-      tags,
-    });
-
-    if (response.data.result === "success") {
-      message.success("Item has been successfully added!");
-      registerForm.resetFields();
-    } else if (response.data.result === "failed") {
-      message.wrong("Something went wrong while adding the item!");
-    }
-  };
-
-  const updateItem = async (values) => {
-    const res = await baseRequest.post("/home/update", { id, ...values });
-
-    if (res.data.status === "success") {
-      message.success("Item has been successfully updated!");
-      get_products();
-    } else if (res.data.status === "failed") {
-      message.error("Didn't update the item!");
-    } else {
-      message.error("Server didn't get the request properly!");
-    }
-  };
+  function refreshTable(data) {
+    setProductData(data);
+  }
 
   return (
     <Layout style={{ width: "100%" }}>
@@ -255,33 +147,12 @@ const homepage = observer((props) => {
               theme="dark"
               mode="inline"
               items={items}
-              onClick={(item) => menuSelector(item)}
+              onClick={(item) => setSelectedModal({ key: Number(item.key) })}
             />
-            <LabelsModal onCancel={hideModal} open={labelsModal} />
-            <ItemsModal
-              open={registerModal}
-              onCancel={hideModal}
-              title="Register New Item"
-              buttonText="Add Item"
-              onFinish={addItem}
-              form={registerForm}
+            <ModalRouter
+              selectedIndex={selectedModal}
+              refreshTable={refreshTable}
             />
-            <ItemsModal
-              open={updateModal}
-              onCancel={hideModal}
-              title="Update Item"
-              buttonText="Update Item"
-              form={updateForm}
-              onFinish={updateItem}
-            />
-            <GiveModal
-              open={giveModal}
-              onCancel={hideModal}
-              title="Give Item"
-              form={giveForm}
-            />
-            <TechnicianModal open={technicianModal} onCancel={hideModal} />
-            <LogModal open={logModal} onCancel={hideModal} />
           </Sider>
 
           <Layout style={{ padding: "0 24px 24px", width: "400%" }}>
@@ -305,7 +176,7 @@ const homepage = observer((props) => {
                   onRow={(record, _) => {
                     return {
                       onClick: async () => {
-                        updateForm.setFieldsValue({
+                        const product = {
                           parts: record.parts,
                           count: String(record.count),
                           price: record.price.substring(1),
@@ -314,9 +185,10 @@ const homepage = observer((props) => {
                           new_location: record.new_location,
                           fishbowl: record.fishbowl,
                           tags: record.tags.split(","),
-                        });
-                        setID(record._id);
-                        setUpdateModal(true);
+                          id: record._id,
+                        };
+
+                        setSelectedModal({ key: 6, product: product });
                       },
                     };
                   }}

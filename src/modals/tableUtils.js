@@ -1,24 +1,18 @@
 import { useState, useRef } from "react";
 import React, { useContext, useEffect } from "react";
-
 import {
   Button,
   Input,
   Space,
   Table,
   Tag,
-  Layout,
   Form,
   Select,
   Popconfirm,
-  message,
 } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 
-import baseRequest from "../../core/baseRequest";
-
-const { Content } = Layout;
 const { Option } = Select;
 
 const ProductTable = (props) => {

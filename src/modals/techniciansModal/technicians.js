@@ -1,73 +1,43 @@
 import { useEffect, useState } from "react";
 import {
-  message,
   Form,
   Input,
   Button,
   Modal,
   Row,
-  Tag,
-  Select,
   Table,
   Popconfirm,
   Space,
   Layout,
 } from "antd";
 
-import baseRequest from "../../core/baseRequest";
+import {
+  get_technicians,
+  addTechnician,
+  handleDelete,
+  handleSave,
+} from "./techniciansController";
 
-import { EditableCell, EditableRow } from "./tableUtils";
+import { EditableCell, EditableRow } from "../tableUtils";
+
 const { Content } = Layout;
 
 const TechnicianModal = (props) => {
   const [data, setData] = useState();
 
-  const get_technicians = async () => {
-    const res = await baseRequest.post("/technician", {});
-    if (res.data.status === "success") {
-      const records = res.data.records;
-      const dataSource = [];
-      for (let i = 0; i < Object.keys(records).length; i++) {
-        dataSource.push(Object.values(records)[i]);
-      }
-      setData(dataSource);
-    } else if (res.data.status === "failed") {
-      message.error("Something went wrong while retrieving labels!");
-    }
+  const load_technicians = async () => {
+    const technicians = await get_technicians();
+    setData(technicians);
   };
 
   useEffect(() => {
     if (props.open) {
-      get_technicians();
+      load_technicians();
     }
   }, [props.open]);
 
-  const addTechnician = async (values) => {
-    const res = await baseRequest.post("/technician/add", values);
-    if (res.data.error) {
-      if (res.data.error.code === 11000) {
-        message.error("This technician already exists!");
-      }
-    } else {
-      message.success(res.data.resultData.name + " is successfully created!");
-
-      form.resetFields();
-      get_technicians();
-    }
-  };
   const [form] = Form.useForm();
 
-  const handleDelete = async (id) => {
-    const res = await baseRequest.post("/technician/delete", { id: id });
-    if (res.data.status === "success") {
-      message.success("Technician has been successfully deleted!");
-      get_technicians();
-    } else if (res.data.status === "failed") {
-      message.error("Didn't delete the technician!");
-    } else {
-      message.error("Server didn't get the request properly!");
-    }
-  };
   const defaultColumns = [
     {
       title: "Technician Name",
@@ -83,24 +53,16 @@ const TechnicianModal = (props) => {
         data.length >= 1 ? (
           <Popconfirm
             title="Sure to delete?"
-            onConfirm={() => handleDelete(record._id)}
+            onConfirm={async () => {
+              await handleDelete(record._id);
+              await load_technicians();
+            }}
           >
             <a>Delete</a>
           </Popconfirm>
         ) : null,
     },
   ];
-  const handleSave = async (row) => {
-    const res = await baseRequest.post("/technician/update", row);
-    if (res.data.status === "success") {
-      message.success("Label has been successfully updated!");
-      get_technicians();
-    } else if (res.data.status === "failed") {
-      message.error("Didn't update the label!");
-    } else {
-      message.error("Server didn't get the request properly!");
-    }
-  };
 
   const components = {
     body: {
@@ -120,14 +82,17 @@ const TechnicianModal = (props) => {
         dataIndex: col.dataIndex,
         title: col.title,
         type: col.type,
-        handleSave,
+        handleSave: async (row) => {
+          await handleSave(row);
+          await load_technicians();
+        },
       }),
     };
   });
 
   return (
     <Modal
-      width={700}
+      width={"23%"}
       onCancel={() => {
         props.onCancel();
         form.resetFields();
@@ -142,7 +107,10 @@ const TechnicianModal = (props) => {
             name="horizontal_login"
             form={form}
             layout="inline"
-            onFinish={addTechnician}
+            onFinish={async (values) => {
+              await addTechnician(values, form);
+              await load_technicians();
+            }}
           >
             <Form.Item
               name="name"
@@ -170,7 +138,6 @@ const TechnicianModal = (props) => {
             }}
           >
             <Table
-              style={{ width: 600 }}
               components={components}
               rowClassName={() => "editable-row"}
               bordered

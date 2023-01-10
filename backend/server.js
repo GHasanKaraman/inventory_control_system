@@ -245,6 +245,10 @@ db.once("open", function () {
       tags = temp.substring(0, temp.length - 1);
 
       price = essentials.numberFormatToEU(price);
+      fishbowl = fishbowl.toUpperCase();
+      from_where = from_where.toUpperCase();
+      new_location = new_location.toUpperCase();
+      parts = parts.toUpperCase();
 
       if (id) {
         const result = await productModel.updateOne(

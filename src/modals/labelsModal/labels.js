@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  message,
   Form,
   Input,
   Button,
@@ -14,9 +13,14 @@ import {
   Layout,
 } from "antd";
 
-import baseRequest from "../../core/baseRequest";
+import {
+  get_labels,
+  addLabel,
+  handleDelete,
+  handleSave,
+} from "./labelsController";
 
-import { EditableCell, EditableRow } from "./tableUtils";
+import { EditableCell, EditableRow } from "../tableUtils";
 
 const { Option } = Select;
 const { Content } = Layout;
@@ -38,56 +42,19 @@ const colors = [
 
 const LabelsModal = (props) => {
   const [data, setData] = useState();
+  const [form] = Form.useForm();
 
-  const get_labels = async () => {
-    const res = await baseRequest.post("/labels", {});
-    if (res.data.status === "success") {
-      const records = res.data.records;
-      const dataSource = [];
-      for (let i = 0; i < Object.keys(records).length; i++) {
-        dataSource.push(Object.values(records)[i]);
-      }
-      setData(dataSource);
-    } else if (res.data.status === "failed") {
-      message.error("Something went wrong while retrieving labels!");
-    }
+  const load_labels = async () => {
+    const dataSource = await get_labels();
+    setData(dataSource);
   };
 
   useEffect(() => {
     if (props.open) {
-      get_labels();
+      load_labels();
     }
   }, [props.open]);
 
-  const addLabel = async (values) => {
-    const res = await baseRequest.post("/labels/add", values);
-    if (res.data.error_code) {
-      if (res.data.error.code === 11000) {
-        message.error("This label already exists!");
-      }
-    } else {
-      console.log(res.data);
-      message.success(
-        res.data.resultData.name + " label is successfully created!"
-      );
-
-      form.resetFields();
-      get_labels();
-    }
-  };
-  const [form] = Form.useForm();
-
-  const handleDelete = async (id) => {
-    const res = await baseRequest.post("/labels/delete", { id: id });
-    if (res.data.status === "success") {
-      message.success("Label has been successfully deleted!");
-      get_labels();
-    } else if (res.data.status === "failed") {
-      message.error("Didn't delete the label!");
-    } else {
-      message.error("Server didn't get the request properly!");
-    }
-  };
   const defaultColumns = [
     {
       title: "Tag Name",
@@ -112,24 +79,16 @@ const LabelsModal = (props) => {
         data.length >= 1 ? (
           <Popconfirm
             title="Sure to delete?"
-            onConfirm={() => handleDelete(record._id)}
+            onConfirm={async () => {
+              await handleDelete(record._id);
+              await load_labels();
+            }}
           >
             <a>Delete</a>
           </Popconfirm>
         ) : null,
     },
   ];
-  const handleSave = async (row) => {
-    const res = await baseRequest.post("/labels/update", row);
-    if (res.data.status === "success") {
-      message.success("Label has been successfully updated!");
-      get_labels();
-    } else if (res.data.status === "failed") {
-      message.error("Didn't update the label!");
-    } else {
-      message.error("Server didn't get the request properly!");
-    }
-  };
 
   const components = {
     body: {
@@ -149,7 +108,10 @@ const LabelsModal = (props) => {
         dataIndex: col.dataIndex,
         title: col.title,
         type: col.type,
-        handleSave,
+        handleSave: async (row) => {
+          await handleSave(row);
+          await load_labels();
+        },
       }),
     };
   });
@@ -160,6 +122,7 @@ const LabelsModal = (props) => {
         props.onCancel();
         form.resetFields();
       }}
+      width={"28%"}
       footer={null}
       open={props.open}
       title="Labels"
@@ -174,7 +137,10 @@ const LabelsModal = (props) => {
             name="horizontal_login"
             form={form}
             layout="inline"
-            onFinish={addLabel}
+            onFinish={async (values) => {
+              await addLabel(values, form);
+              await load_labels();
+            }}
           >
             <Form.Item
               wrapperCol={{
@@ -201,7 +167,7 @@ const LabelsModal = (props) => {
                 allowClear
                 style={{
                   textAlign: "center",
-                  width: "200%",
+                  width: "130px",
                 }}
               >
                 {colors.map((color) => {
@@ -224,7 +190,7 @@ const LabelsModal = (props) => {
             <Form.Item
               shouldUpdate
               wrapperCol={{
-                xxl: { span: 2, offset: 12 },
+                xxl: { span: 19, offset: 5 },
                 xs: { span: 2, offset: 24 },
               }}
             >

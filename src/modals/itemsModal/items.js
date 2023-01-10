@@ -1,64 +1,29 @@
 import { useState, useEffect } from "react";
 
-import {
-  Modal,
-  Tag,
-  Select,
-  Form,
-  Input,
-  Button,
-  message,
-  Typography,
-} from "antd";
+import { Modal, Select, Form, Input, Button, Typography } from "antd";
 
-import baseRequest from "../../core/baseRequest";
-
-const tagRender = (props) => {
-  const { options, e } = props;
-  const { label, value, closable, onClose } = e;
-  const onPreventMouseDown = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  return options.filter((item) => item.name === value).length != 0 ? (
-    <Tag
-      color={options.filter((item) => item.name === value)[0].color}
-      onMouseDown={onPreventMouseDown}
-      closable={closable}
-      onClose={onClose}
-      style={{
-        marginRight: 3,
-      }}
-    >
-      {value}
-    </Tag>
-  ) : undefined;
-};
+import { addItem, get_labels, tagRender, updateItem } from "./itemsController";
 
 const ItemsModal = (props) => {
+  const [form] = Form.useForm();
+  const [id, setID] = useState();
+
   const [options, setOptions] = useState([{ value: "gold", value: "lime" }]);
 
-  const get_labels = async () => {
-    const res = await baseRequest.post("/labels", {});
-    if (res.data.status === "success") {
-      const records = res.data.records;
-
-      const dataSource = [];
-      for (let i = 0; i < Object.keys(records).length; i++) {
-        dataSource.push(Object.values(records)[i]);
-      }
-
-      setOptions(dataSource);
-    } else {
-      message.error("Something went wrong while retrieving labels!");
-    }
+  const load_items = async () => {
+    const labels = await get_labels();
+    setOptions(labels);
   };
 
   useEffect(() => {
     if (props.open) {
-      get_labels();
+      load_items();
+      if (props.product) {
+        form.setFieldsValue(props.product);
+        setID(props.product.id);
+      }
     } else {
-      props.form.resetFields();
+      form.resetFields();
     }
   }, [props.open]);
 
@@ -75,8 +40,11 @@ const ItemsModal = (props) => {
       </Typography.Title>
       <Form
         name="normal_login"
-        onFinish={props.onFinish}
-        form={props.form}
+        onFinish={(values) => {
+          if (props.type === "add") addItem(values, form);
+          if (props.type === "update") updateItem(values, id);
+        }}
+        form={form}
         style={{ marginTop: 30 }}
       >
         <Form.Item
@@ -91,7 +59,7 @@ const ItemsModal = (props) => {
           name="count"
           rules={[
             {
-              validator(rule, value) {
+              validator(_, value) {
                 return new Promise((resolve, reject) => {
                   if (!value) {
                     reject("Please enter the count of the item!");
@@ -120,7 +88,7 @@ const ItemsModal = (props) => {
           name="price"
           rules={[
             {
-              validator(rule, value) {
+              validator(_, value) {
                 return new Promise((resolve, reject) => {
                   if (!value) {
                     reject("Please enter the price of the item!");
@@ -128,18 +96,17 @@ const ItemsModal = (props) => {
                   if (value.includes(".")) {
                     reject("Dot symbol is not accepted!");
                   }
-                  value = value.split(",")
-                  console.log(value)
-                  if(value.length > 2){
-                    reject("Please enter the number properly!")
+                  value = value.split(",");
+                  if (value.length > 2) {
+                    reject("Please enter the number properly!");
                   }
                   if (!isNaN(value[0])) {
-                    if(value.length == 2){
-                      if(isNaN(value[1])){
-                        reject("Please enter a number!")
+                    if (value.length == 2) {
+                      if (isNaN(value[1])) {
+                        reject("Please enter a number!");
                       }
-                      if(value[1]==""){
-                        reject("Please enter a number!")
+                      if (value[1] == "") {
+                        reject("Please enter a number!");
                       }
                     }
                     if (value[0] < 0) {
@@ -173,13 +140,13 @@ const ItemsModal = (props) => {
           name="min_quantity"
           rules={[
             {
-              validator(rule, value) {
+              validator(_, value) {
                 return new Promise((resolve, reject) => {
                   if (!value) {
                     reject("Please enter min quantity!");
                   }
-                  if(value.includes(".")){
-                    reject("Please enter an integer!")
+                  if (value.includes(".")) {
+                    reject("Please enter an integer!");
                   }
                   if (!isNaN(value)) {
                     if (value < 0) {

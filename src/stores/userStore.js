@@ -1,4 +1,6 @@
 import { observable, action, makeObservable } from "mobx";
+import { useNavigate } from "react-router-dom";
+import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 import { b64EncodeUnicode } from "../utils/helpers";
 
@@ -14,6 +16,7 @@ export class UserStore {
       email: observable,
       changeStatus: action,
       login: action,
+      logout: action,
       control: action,
     });
   }
@@ -31,14 +34,19 @@ export class UserStore {
       baseRequest.addToken(response.data.token);
       this.name = response.data.resultData.name;
       this.email = response.data.resultData.email;
-      this.isLoggedIn = true;
+      this.changeStatus(true);
       localStorage.setItem("name", this.name);
 
       return response.data;
+    } else {
+      return { result: response.data.result };
     }
-    else{
-      return {result:response.data.result}
-    }
+  }
+
+  logout() {
+    localStorage.removeItem("token");
+    message.success("You have successfully logged out!");
+    return 1;
   }
 
   control() {
