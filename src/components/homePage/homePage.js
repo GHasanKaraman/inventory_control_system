@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { observer } from "mobx-react";
 import { useNavigate } from "react-router-dom";
 
-import { ConfigProvider, Layout, Menu, message, Form, Typography } from "antd";
+import { ConfigProvider, Layout, Menu, message, Typography } from "antd";
 import {
   UploadOutlined,
   TagsOutlined,
@@ -18,6 +18,7 @@ import { useStore } from "../../stores/useStore";
 import ModalRouter from "../../modals/modalRouter";
 
 import { ProductTable } from "../../modals/tableUtils";
+import { get_products, handleDelete, get_colors } from "./homeController";
 
 const { Sider, Content } = Layout;
 
@@ -43,24 +44,25 @@ const homepage = observer(() => {
   const { userStore } = useStore();
 
   const [selectedModal, setSelectedModal] = useState();
-
   const [user, setUser] = useState();
-  const [productData, setProductData] = useState();
-
+  const [data, setData] = useState();
   const [colorData, setColorData] = useState();
 
   const navigate = useNavigate();
 
-  const get_products = async (response) => {
-    const res = response ? response : await baseRequest.post("/home", {});
-    const records = res.data.records;
-    const dataSource = [];
-    for (let i = 0; i < Object.keys(records).length; i++) {
-      records[i].price = "$" + records[i].price.replace(".", ",");
-      records[i].total_price = "$" + records[i].total_price.replace(".", ",");
-      dataSource.push(Object.values(records)[i]);
-    }
-    setProductData(dataSource);
+  useEffect(() => {
+    load_colors();
+    loadHomePage();
+  }, []);
+
+  const load_products = async (res) => {
+    const products = await get_products(res);
+    setData(products);
+  };
+
+  const load_colors = async () => {
+    const colors = await get_colors();
+    setColorData(colors);
   };
 
   const loadHomePage = async () => {
@@ -79,7 +81,7 @@ const homepage = observer(() => {
         navigate("/login");
         message.error("Your session has expired! Please sign in again.");
       } else if (res.data.status === "success") {
-        await get_products(res);
+        load_products(res);
         setUser(res.data.user[0]);
       }
     } else {
@@ -100,35 +102,8 @@ const homepage = observer(() => {
     });
   };
 
-  const handleDelete = async (id) => {
-    const res = await baseRequest.post("/home/delete", { id: id });
-    if (res.data.status === "success") {
-      message.success("Item has been successfully deleted!");
-      await get_products();
-    } else if (res.data.status === "failed!") {
-      message.error("Didn't delete the item!");
-    } else {
-      message.error("Server didn't get the request properly!");
-    }
-  };
-
-  const getColor = async () => {
-    const res = await baseRequest.post("/labels", {});
-
-    if (res.data.status === "success") {
-      setColorData(Object.values(res.data.records));
-    } else if (res.data.status === "failed") {
-      message.error("Colors have not been retrieved!");
-    }
-  };
-
-  useEffect(() => {
-    getColor();
-    loadHomePage();
-  }, []);
-
   function refreshTable(data) {
-    setProductData(data);
+    setData(data);
   }
 
   return (
@@ -169,7 +144,7 @@ const homepage = observer(() => {
               </div>
               {colorData ? (
                 <ProductTable
-                  dataSource={productData}
+                  dataSource={data}
                   tagColors={colorData}
                   onDelete={handleDelete}
                   onGive={handleGive}
