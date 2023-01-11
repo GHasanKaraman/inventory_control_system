@@ -13,6 +13,7 @@ import {
 } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
+import PrintComponent from "../utils/print";
 
 const { Option } = Select;
 
@@ -267,15 +268,17 @@ const ProductTable = (props) => {
                   {
                     key: 1,
                     label: (
-                      <Button
-                        type="primary"
+                      <span
                         onClick={(event) => {
                           event.stopPropagation();
-                          props.onPrint(record);
                         }}
                       >
-                        Print
-                      </Button>
+                        <PrintComponent
+                          url={"https://google.com"}
+                          part={record.parts}
+                          location={record.new_location}
+                        />
+                      </span>
                     ),
                   },
                   {

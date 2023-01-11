@@ -1,12 +1,12 @@
 import QRCode from "qrcode.react";
 
 const QRGenerator = (props) => {
-  const { valueString, documentId } = props;
+  const { url, width } = props;
   return (
     <QRCode
-      id={documentId}
-      value={valueString}
-      size={128}
+      id={url}
+      value={url}
+      size={width}
       bgColor={"#ffffff"}
       fgColor={"#000000"}
       level={"H"}

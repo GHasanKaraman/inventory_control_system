@@ -36,8 +36,4 @@ const get_colors = async () => {
   }
 };
 
-const print_qr = async (record) => {
-  console.log(record);
-};
-
-export { get_products, handleDelete, get_colors, print_qr };
+export { get_products, handleDelete, get_colors };

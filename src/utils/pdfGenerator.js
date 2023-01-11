@@ -1,60 +1,42 @@
-import {
-  Page,
-  Text,
-  View,
-  Document,
-  StyleSheet,
-  Image,
-} from "@react-pdf/renderer";
+import { QRCode } from "antd";
+import QRGenerator from "./qrGenerator";
 
-const styles = StyleSheet.create({
-  page: {
-    backgroundColor: "white",
-    display: "block",
-  },
+const styles = {
   view: {
     display: "flex",
     flexDirection: "row",
     justifyContent: "center",
-    width: "100%",
+    width: "75%",
     border: "1pt solid #000",
   },
   subView: {
     justifyContent: "center",
     textAlign: "center",
-  },
-  QRImage: {
-    width: "55px",
+    padding: "25px 0px",
   },
   partText: {
-    fontSize: "10px",
+    fontSize: "13px",
   },
   locText: {
-    fontSize: "10px",
+    fontSize: "12px",
   },
-});
+};
 
 const PDFGenerator = (props) => {
   const { url, part, location } = props;
 
   return (
-    <Document>
-      <Page key={`PageId_${url}`} size={"B8"} style={styles.page}>
-        <View style={styles.view}>
-          <Image
-            allowDangerousPaths
-            src={document.getElementById(url).toDataURL()}
-            style={styles.QRImage}
-          />
-          <View style={styles.subView}>
-            <Text style={styles.partText}>{part}</Text>
-            <View style={styles.subView}>
-              <Text style={styles.locText}>{location}</Text>
-            </View>
-          </View>
-        </View>
-      </Page>
-    </Document>
+    <div style={styles.view}>
+      <div styles={styles.subView}>
+        <QRGenerator width={75} url={url} />
+      </div>
+      <div style={styles.subView}>
+        <div style={styles.partText}>{part}</div>
+        <div>
+          <div style={styles.locText}>{location}</div>
+        </div>
+      </div>
+    </div>
   );
 };
 

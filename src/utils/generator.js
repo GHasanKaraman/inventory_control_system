@@ -1,26 +1,15 @@
-import QRGenerator from "./qrGenerator";
-import { PDFDownloadLink } from "@react-pdf/renderer";
 import PDFGenerator from "./pdfGenerator";
+import React from "react";
 
-const QRCodeGenerator = (props) => {
-  const { url, part, location } = props;
-  const downloadName = "qrcodes";
-
-  return (
-    <div>
-      <div style={{ display: "none" }} key={`qrGenerator_${url}`}>
-        <QRGenerator valueString={url} documentId={url} />
+class QRCodeGenerator extends React.Component {
+  render() {
+    const { url, part, location } = this.props;
+    return (
+      <div>
+        <PDFGenerator url={url} part={part} location={location} />
       </div>
-      <PDFDownloadLink
-        document={<PDFGenerator url={url} part={part} location={location} />}
-        fileName={`${downloadName}.pdf`}
-      >
-        {({ loading }) => {
-          return loading ? "Loading document..." : "Download PDF";
-        }}
-      </PDFDownloadLink>
-    </div>
-  );
-};
+    );
+  }
+}
 
 export default QRCodeGenerator;

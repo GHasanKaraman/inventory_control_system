@@ -18,14 +18,7 @@ import { useStore } from "../../stores/useStore";
 import ModalRouter from "../../modals/modalRouter";
 
 import { ProductTable } from "../tableUtils";
-import {
-  get_products,
-  handleDelete,
-  get_colors,
-  print_qr,
-} from "./homeController";
-
-import QRCodeGenerator from "../../utils/generator";
+import { get_products, handleDelete, get_colors } from "./homeController";
 
 const { Sider, Content } = Layout;
 
@@ -145,19 +138,12 @@ const homepage = observer(() => {
                   textAlign: "center",
                 }}
               >
-                <QRCodeGenerator
-                  url={"https://google.com"}
-                  part={"Citizen Label Printer"}
-                  location={"IT Room"}
-                />
-
                 <Typography.Title style={{ color: "#227C70" }} level={4}>
                   {user ? user.name.split(" ")[0] : ""}
                 </Typography.Title>
               </div>
               {colorData ? (
                 <ProductTable
-                  onPrint={print_qr}
                   dataSource={data}
                   tagColors={colorData}
                   onDelete={handleDelete}
