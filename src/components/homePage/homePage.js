@@ -24,8 +24,8 @@ import {
   get_colors,
   print_qr,
 } from "./homeController";
-import { QRGenerator } from "../../utils/qrGenerator";
-import { PDFGenerator } from "../../utils/pdfGenerator";
+
+import QRCodeGenerator from "../../utils/generator";
 
 const { Sider, Content } = Layout;
 
@@ -145,7 +145,11 @@ const homepage = observer(() => {
                   textAlign: "center",
                 }}
               >
-                <PDFGenerator />
+                <QRCodeGenerator
+                  url={"https://google.com"}
+                  part={"Citizen Label Printer"}
+                  location={"IT Room"}
+                />
 
                 <Typography.Title style={{ color: "#227C70" }} level={4}>
                   {user ? user.name.split(" ")[0] : ""}

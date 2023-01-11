@@ -15,4 +15,4 @@ const QRGenerator = (props) => {
   );
 };
 
-export { QRGenerator };
+export default QRGenerator;
