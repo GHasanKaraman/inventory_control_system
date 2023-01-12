@@ -16,7 +16,6 @@ export class UserStore {
       email: observable,
       changeStatus: action,
       login: action,
-      logout: action,
       control: action,
     });
   }
@@ -41,12 +40,6 @@ export class UserStore {
     } else {
       return { result: response.data.result };
     }
-  }
-
-  logout() {
-    localStorage.removeItem("token");
-    message.success("You have successfully logged out!");
-    return 1;
   }
 
   control() {

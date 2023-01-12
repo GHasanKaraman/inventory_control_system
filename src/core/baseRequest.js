@@ -1,6 +1,5 @@
 import axios from "axios";
 
-
 const baseUrl = "http://10.12.9.63:4000";
 //baseUrl = "http://localhost:4000"
 
@@ -13,6 +12,13 @@ const baseRequest = {
       .catch((error) => {
         return error;
       });
+  },
+  multiPartPost: (path, form) => {
+    return axios.post(baseUrl + path, form, {
+      headers: {
+        "content-type": "multipart/form-data;",
+      },
+    });
   },
   post: (path, params) => {
     return baseRequest.request("POST", path, params);

@@ -1,4 +1,3 @@
-import { QRCode } from "antd";
 import QRGenerator from "./qrGenerator";
 
 const styles = {
@@ -12,7 +11,7 @@ const styles = {
   subView: {
     justifyContent: "center",
     textAlign: "center",
-    padding: "25px 0px",
+    padding: "30px 0px",
   },
   partText: {
     fontSize: "13px",
@@ -28,7 +27,7 @@ const PDFGenerator = (props) => {
   return (
     <div style={styles.view}>
       <div styles={styles.subView}>
-        <QRGenerator width={75} url={url} />
+        <QRGenerator width={90} url={url} />
       </div>
       <div style={styles.subView}>
         <div style={styles.partText}>{part}</div>

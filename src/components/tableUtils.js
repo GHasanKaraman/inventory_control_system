@@ -274,7 +274,11 @@ const ProductTable = (props) => {
                         }}
                       >
                         <PrintComponent
-                          url={"https://google.com"}
+                          url={(
+                            "http://" +
+                            window.location.hostname +
+                            `:${window.location.port}/qr/${record._id}`
+                          ).trim()}
                           part={record.parts}
                           location={record.new_location}
                         />

@@ -2,6 +2,7 @@ const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
+const multer = require("multer");
 
 const userModel = require("./models/user");
 const tokenModel = require("./models/token");
@@ -9,13 +10,33 @@ const productModel = require("./models/product");
 const labelModel = require("./models/label");
 const technicianModel = require("./models/technician");
 const technicianLogModel = require("./models/technicianLog");
-
+var path = require("path");
 const uuid = require("uuid");
 const md5 = require("md5");
 const essentials = require("./utils/essentials");
 
 require("dotenv").config();
 
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    cb(null, uuid.v4() + "-" + Date.now() + path.extname(file.originalname));
+  },
+});
+
+const fileFilter = (req, file, cb) => {
+  const allowedFileTypes = ["images/jpeg", "images/jpg", "images/png"];
+  if (allowedFileTypes.includes(file.mimetype)) {
+    cb(null, true);
+  } else {
+    cb(null, false);
+  }
+};
+
+//const upload = multer({ storage, fileFilter });
+const upload = multer({ dest: "uploads/", storage: storage });
 const app = express();
 mongoose.set("strictQuery", false);
 mongoose.connect(
@@ -40,6 +61,32 @@ db.once("open", function () {
 
   app.get("/", async (req, res) => {
     res.send("Listening the port...");
+  });
+
+  app.post("/qr", async (req, res) => {
+    try {
+      const { id } = req.body;
+      const product = await productModel.findById(id);
+      if (product) {
+        const techs = await technicianModel.find({});
+        if (techs) {
+          res.json({
+            result: "success",
+            resultData: product,
+            records: { ...techs },
+          });
+          console.log("Retrieved technicians!");
+        } else {
+          res.json({ result: "failed", resultData: "technicians_retrieve" });
+          console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve technicians!");
+        }
+      } else {
+        res.json({ result: "failed", resultData: "product_not_found" });
+      }
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
   });
 
   app.post("/register", async (req, res) => {
@@ -128,7 +175,8 @@ db.once("open", function () {
       "/technician/add" ||
       "/technician/delete" ||
       "/technician/update" ||
-      "/logs"
+      "/logs" ||
+      "/qr"
     ) {
       try {
         const token = req.header("Authorization");
@@ -437,7 +485,7 @@ db.once("open", function () {
     }
   });
 
-  app.post("/items", async (req, res) => {
+  app.post("/items", upload.single("file"), async (req, res) => {
     try {
       let {
         count,
@@ -450,14 +498,20 @@ db.once("open", function () {
         tags,
       } = req.body;
 
-      let temp = "";
-      tags.forEach((element) => {
-        temp += element + ",";
-      });
-      tags = temp.substring(0, temp.length - 1);
-
       price = essentials.numberFormatToEU(price);
 
+      console.log(
+        count,
+        fishbowl,
+        from_where,
+        min_quantity,
+        new_location,
+        parts,
+        price,
+        tags
+      );
+
+      /*
       const result = await productModel.create({
         count,
         fishbowl,
@@ -476,6 +530,7 @@ db.once("open", function () {
       } else {
         res.json({ result: "failed" });
       }
+      */
     } catch (e) {
       res.json({ error: e });
       console.log(e);
@@ -483,7 +538,7 @@ db.once("open", function () {
   });
 
   app.post("/technician", async (req, res) => {
-    let techs = await technicianModel.find({});
+    const techs = await technicianModel.find({});
     if (techs) {
       res.json({
         status: "success",

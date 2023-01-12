@@ -1,14 +1,59 @@
 import { useState, useEffect } from "react";
 
-import { Modal, Select, Form, Input, Button, Typography } from "antd";
+import {
+  Modal,
+  Select,
+  Form,
+  Input,
+  Button,
+  Typography,
+  Upload,
+  message,
+} from "antd";
+import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 
 import { addItem, get_labels, tagRender, updateItem } from "./itemsController";
 
 const ItemsModal = (props) => {
   const [form] = Form.useForm();
-  const [id, setID] = useState();
 
-  const [options, setOptions] = useState([{ value: "gold", value: "lime" }]);
+  const [id, setID] = useState();
+  const [loading, setLoading] = useState(false);
+  const [imageUrl, setImageUrl] = useState();
+  const [options, setOptions] = useState([{ value: "gold" }]);
+  const [file, setFile] = useState(null);
+
+  const handleChange = (info) => {
+    if (info.file.status === "uploading") {
+      setLoading(true);
+      return;
+    }
+    if (info.file.status === "done") {
+      // Get this url from response in real world.
+      getBase64(info.file.originFileObj, (url) => {
+        setLoading(false);
+        setImageUrl(url);
+      });
+    }
+  };
+
+  const getBase64 = (img, callback) => {
+    const reader = new FileReader();
+    reader.addEventListener("load", () => callback(reader.result));
+    reader.readAsDataURL(img);
+  };
+  const beforeUpload = (file) => {
+    setFile(file);
+    const isJpgOrPng = file.type === "image/jpeg" || file.type === "image/png";
+    if (!isJpgOrPng) {
+      message.error("You can only upload JPG/PNG file!");
+    }
+    const isLt2M = file.size / 1024 / 1024 < 2;
+    if (!isLt2M) {
+      message.error("Image must smaller than 2MB!");
+    }
+    return isJpgOrPng && isLt2M;
+  };
 
   const load_items = async () => {
     const labels = await get_labels();
@@ -24,8 +69,31 @@ const ItemsModal = (props) => {
       }
     } else {
       form.resetFields();
+      setImageUrl(null);
     }
   }, [props.open]);
+
+  const uploadButton = (
+    <div>
+      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      <div
+        style={{
+          marginTop: 8,
+        }}
+      >
+        Upload
+      </div>
+    </div>
+  );
+
+  const dummyRequest = async ({ file, onSuccess }) => {
+    setLoading(true);
+    setImageUrl(null);
+    setTimeout(() => {
+      onSuccess("ok");
+      setLoading(false);
+    }, 1000);
+  };
 
   return (
     <Modal
@@ -39,14 +107,41 @@ const ItemsModal = (props) => {
         {props.title}
       </Typography.Title>
       <Form
+        enctype="multipart/form-data"
         name="normal_login"
         onFinish={(values) => {
+          values["file"] = file;
           if (props.type === "add") addItem(values, form);
           if (props.type === "update") updateItem(values, id);
         }}
         form={form}
         style={{ marginTop: 30 }}
       >
+        <Form.Item name="file">
+          <Upload
+            rules={[
+              { required: true, message: "Please input name of the parts!" },
+            ]}
+            customRequest={dummyRequest}
+            listType="picture-card"
+            className="avatar-uploader"
+            showUploadList={false}
+            beforeUpload={beforeUpload}
+            onChange={handleChange}
+          >
+            {imageUrl ? (
+              <img
+                src={imageUrl}
+                alt="avatar"
+                style={{
+                  width: "100%",
+                }}
+              />
+            ) : (
+              uploadButton
+            )}
+          </Upload>
+        </Form.Item>
         <Form.Item
           name="parts"
           rules={[

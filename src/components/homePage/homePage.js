@@ -92,7 +92,7 @@ const homepage = observer(() => {
 
   const handleGive = (record) => {
     setSelectedModal({
-      key: 5,
+      otherKey: 2,
       product: {
         parts: record.parts,
         count: record.count,
@@ -163,7 +163,7 @@ const homepage = observer(() => {
                           id: record._id,
                         };
 
-                        setSelectedModal({ key: 6, product: product });
+                        setSelectedModal({ otherKey: 1, product: product });
                       },
                     };
                   }}

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 
-import { get_products } from "./modalsController";
+import { get_products, logout } from "./modalsController";
 
 import LabelsModal from "./labelsModal/labels";
 import ItemsModal from "./itemsModal/items";
@@ -9,6 +10,8 @@ import TechnicianModal from "./techniciansModal/technicians";
 import LogModal from "./logsModal/logs";
 
 const ModalRouter = (props) => {
+  const navigate = useNavigate();
+
   const [logModal, setLogModal] = useState(false);
   const [labelsModal, setLabelsModal] = useState(false);
   const [registerModal, setRegisterModal] = useState(false);
@@ -41,34 +44,46 @@ const ModalRouter = (props) => {
   };
 
   useEffect(() => {
-    if (props.selectedIndex && props.selectedIndex.key)
-      switch (props.selectedIndex.key) {
-        case 1:
-          setRegisterModal(true);
-          break;
-        case 2:
-          setLabelsModal(true);
-          break;
-        case 3:
-          setTechnicianModal(true);
-          break;
-        case 4:
-          setLogModal(true);
-          break;
-        case 5:
-          setGiveModal(true);
-          break;
-        case 6:
-          setUpdateModal(true);
-          break;
-        default:
-          console.log("Default");
-          break;
+    if (props.selectedIndex) {
+      if (props.selectedIndex.key) {
+        switch (props.selectedIndex.key) {
+          case 1:
+            setRegisterModal(true);
+            break;
+          case 2:
+            setLabelsModal(true);
+            break;
+          case 3:
+            setTechnicianModal(true);
+            break;
+          case 4:
+            setLogModal(true);
+            break;
+          case 5:
+            logout();
+            navigate("/login");
+          default:
+            console.log("Menu");
+            break;
+        }
+      } else {
+        switch (props.selectedIndex.otherKey) {
+          case 1:
+            setUpdateModal(true);
+            break;
+          case 2:
+            setGiveModal(true);
+            break;
+          default:
+            console.log("Other");
+            break;
+        }
       }
+    }
   }, [props.selectedIndex]);
 
-  const modals = [
-    null,
+  const menuModals = [
+    <div />,
     <ItemsModal
       type="add"
       open={registerModal}
@@ -79,11 +94,10 @@ const ModalRouter = (props) => {
     <LabelsModal open={labelsModal} onCancel={hideModal} />,
     <TechnicianModal open={technicianModal} onCancel={hideModal} />,
     <LogModal open={logModal} onCancel={hideModal} />,
-    <GiveModal
-      open={giveModal}
-      onCancel={hideModal}
-      product={props.selectedIndex ? props.selectedIndex.product : null}
-    />,
+  ];
+
+  const otherModals = [
+    <div />,
     <ItemsModal
       type="update"
       product={props.selectedIndex ? props.selectedIndex.product : null}
@@ -92,11 +106,22 @@ const ModalRouter = (props) => {
       title="Update Item"
       buttonText="Update Item"
     />,
+    <GiveModal
+      open={giveModal}
+      onCancel={hideModal}
+      product={props.selectedIndex ? props.selectedIndex.product : null}
+    />,
   ];
 
-  return props.selectedIndex && props.selectedIndex.key
-    ? modals[props.selectedIndex.key]
-    : modals[0];
+  if (props.selectedIndex) {
+    if (props.selectedIndex.key) {
+      return menuModals[props.selectedIndex.key];
+    } else if (props.selectedIndex.otherKey) {
+      return otherModals[props.selectedIndex.otherKey];
+    }
+  }
+
+  return <div />;
 };
 
 export default ModalRouter;

@@ -3,6 +3,7 @@ import { message, Tag } from "antd";
 
 const addItem = async (values, form) => {
   let {
+    file,
     count,
     fishbowl,
     from_where,
@@ -13,29 +14,25 @@ const addItem = async (values, form) => {
     tags,
   } = values;
 
-  parts = parts.toUpperCase();
-  from_where = from_where.toUpperCase();
-  new_location = new_location.toUpperCase();
-  fishbowl = fishbowl.toUpperCase();
-  tags = tags.length == 0 ? "NTAG" : tags;
+  values.parts = parts.toUpperCase();
+  values.from_where = from_where.toUpperCase();
+  values.new_location = new_location.toUpperCase();
+  values.fishbowl = fishbowl.toUpperCase();
+  values.tags = tags.length == 0 ? "NTAG" : tags;
 
-  const response = await baseRequest.post("/items", {
-    count,
-    fishbowl,
-    from_where,
-    min_quantity,
-    new_location,
-    parts,
-    price,
-    tags,
-  });
+  const formData = new FormData();
+  for (const name in values) {
+    formData.append(name, values[name]);
+  }
 
+  const response = await baseRequest.post("/items", formData);
+  /*
   if (response.data.result === "success") {
     message.success("Item has been successfully added!");
     form.resetFields();
   } else if (response.data.result === "failed") {
     message.wrong("Something went wrong while adding the item!");
-  }
+  }*/
 };
 
 const updateItem = async (values, id) => {

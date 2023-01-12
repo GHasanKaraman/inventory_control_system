@@ -1,3 +1,4 @@
+import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 
 const get_products = async (response) => {
@@ -12,4 +13,9 @@ const get_products = async (response) => {
   return dataSource;
 };
 
-export { get_products };
+const logout = () => {
+  localStorage.removeItem("token");
+  message.success("You have successfully logged out!");
+};
+
+export { get_products, logout };
