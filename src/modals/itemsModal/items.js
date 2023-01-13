@@ -13,10 +13,18 @@ import {
 } from "antd";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 
-import { addItem, get_labels, tagRender, updateItem } from "./itemsController";
+import {
+  addItem,
+  get_labels,
+  tagRender,
+  updateItem,
+  get_locations,
+} from "./itemsController";
 
 const ItemsModal = (props) => {
   const [form] = Form.useForm();
+
+  const [data, setData] = useState([]);
 
   const [id, setID] = useState();
   const [loading, setLoading] = useState(false);
@@ -60,10 +68,15 @@ const ItemsModal = (props) => {
     const labels = await get_labels();
     setOptions(labels);
   };
+  const load_locations = async () => {
+    const locations = await get_locations();
+    setData(locations);
+  };
 
   useEffect(() => {
     if (props.open) {
       load_items();
+      load_locations();
       if (props.product) {
         form.setFieldsValue(props.product);
         setID(props.product.id);
@@ -138,7 +151,11 @@ const ItemsModal = (props) => {
                   if (value) {
                     resolve();
                   } else {
-                    reject("Please upload the image of the item!");
+                    if (props.type === "update") {
+                      resolve();
+                    } else {
+                      reject("Please upload the image of the item!");
+                    }
                   }
                 });
               },
@@ -146,9 +163,6 @@ const ItemsModal = (props) => {
           ]}
         >
           <Upload
-            rules={[
-              { required: true, message: "Please input name of the parts!" },
-            ]}
             customRequest={dummyRequest}
             listType="picture-card"
             className="avatar-uploader"
@@ -256,7 +270,7 @@ const ItemsModal = (props) => {
             },
           ]}
         >
-          <Input placeholder="From Where" />
+          <Input placeholder="Vendor" />
         </Form.Item>
         <Form.Item
           name="min_quantity"
@@ -288,9 +302,14 @@ const ItemsModal = (props) => {
         </Form.Item>
         <Form.Item
           name="new_location"
-          rules={[{ required: true, message: "Please enter new location!" }]}
+          rules={[{ required: true, message: "Please enter the location!" }]}
         >
-          <Input placeholder="New Location" />
+          <Select
+            placeholder="Location"
+            options={data.map((loc) => {
+              return { value: loc.location };
+            })}
+          ></Select>
         </Form.Item>
         <Form.Item
           name="fishbowl"

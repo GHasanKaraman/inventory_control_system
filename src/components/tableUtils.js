@@ -178,15 +178,9 @@ const ProductTable = (props) => {
       width: "25%",
       render: (src) => {
         return (
-          <Image
-            src={src}
-            onClick={(e) => e.stopPropagation()}
-            preview={{
-              onClick: (e) => {
-                e.stopPropagation();
-              },
-            }}
-          />
+          <span onClick={(e) => e.stopPropagation()}>
+            <Image src={src} />
+          </span>
         );
       },
     },
@@ -227,14 +221,14 @@ const ProductTable = (props) => {
       sortDirections: ["descend", "ascend"],
     },
     {
-      title: "Total Price",
+      title: "Inventory Value",
       dataIndex: "total_price",
       key: "total_price",
       width: "10%",
       ...getColumnSearchProps("total_price"),
     },
     {
-      title: "From Where",
+      title: "Vendor",
       dataIndex: "from_where",
       key: "from_where",
       width: "15%",
@@ -248,7 +242,7 @@ const ProductTable = (props) => {
       ...getColumnSearchProps("min_quantity"),
     },
     {
-      title: "New Location",
+      title: "Location",
       dataIndex: "new_location",
       key: "new_location",
       width: "11%",

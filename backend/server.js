@@ -10,6 +10,8 @@ const productModel = require("./models/product");
 const labelModel = require("./models/label");
 const technicianModel = require("./models/technician");
 const technicianLogModel = require("./models/technicianLog");
+const locationModel = require("./models/location");
+
 var path = require("path");
 const uuid = require("uuid");
 const md5 = require("md5");
@@ -22,7 +24,7 @@ const storage = multer.diskStorage({
     cb(null, "uploads");
   },
   filename: (req, file, cb) => {
-    cb(null, uuid.v4() + "-" + Date.now() + path.extname(file.originalname));
+    cb(null, uuid.v4() + "+" + Date.now() + path.extname(file.originalname));
   },
 });
 
@@ -259,7 +261,7 @@ db.once("open", function () {
   app.post("/home/delete", async (req, res) => {
     try {
       const id = req.body.id;
-      if (id) {
+      if (id && (await essentials.deleteImage(id)) == 1) {
         const result = await productModel.deleteOne({ _id: id });
         if (result.deletedCount != 0) {
           res.json({ status: "success" });
@@ -284,7 +286,7 @@ db.once("open", function () {
     }
   });
 
-  app.post("/home/update", async (req, res) => {
+  app.post("/home/update", upload.single("file"), async (req, res) => {
     try {
       let {
         id,
@@ -298,33 +300,40 @@ db.once("open", function () {
         tags,
       } = req.body;
 
-      let temp = "";
-      tags.forEach((element) => {
-        temp += element + ",";
-      });
-      tags = temp.substring(0, temp.length - 1);
-
       price = essentials.numberFormatToEU(price);
       fishbowl = fishbowl.toUpperCase();
       from_where = from_where.toUpperCase();
       new_location = new_location.toUpperCase();
       parts = parts.toUpperCase();
 
-      if (id) {
-        const result = await productModel.updateOne(
-          { _id: id },
-          {
-            count,
-            fishbowl,
-            from_where,
-            min_quantity,
-            new_location,
-            parts,
-            price: price.toFixed(2),
-            tags,
-            total_price: (price * count).toFixed(2),
+      const pipeline = {
+        count,
+        fishbowl,
+        from_where,
+        min_quantity,
+        new_location,
+        parts,
+        price: price.toFixed(2),
+        tags,
+        total_price: (price * count).toFixed(2),
+      };
+      if (req.file) {
+        pipeline.image = req.file.path;
+      }
+
+      const isImageInPipeline = async () => {
+        if (pipeline.image) {
+          if ((await essentials.deleteImage(id)) == 1) {
+            return true;
+          } else {
+            return false;
           }
-        );
+        }
+        return true;
+      };
+
+      if (isImageInPipeline() && id) {
+        const result = await productModel.updateOne({ _id: id }, pipeline);
         if (result.modifiedCount != 0) {
           console.log("\x1b[32m%s\x1b[0m", "Item updated!");
           res.json({ status: "success" });
@@ -650,6 +659,101 @@ db.once("open", function () {
     } else {
       res.json({ status: "failed" });
       console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve logs!");
+    }
+  });
+
+  app.post("/location", async (req, res) => {
+    const locs = await locationModel.find({});
+    if (locs) {
+      res.json({
+        status: "success",
+        records: { ...locs },
+      });
+      console.log("Retrieved locations!");
+    } else {
+      res.json({ status: "failed" });
+      console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve locations!");
+    }
+  });
+
+  app.post("/location/add", async (req, res) => {
+    try {
+      const { location } = req.body;
+      const result = await locationModel.create({
+        location: location.toUpperCase(),
+      });
+      res.json(
+        result._id
+          ? { result: "success", resultData: result }
+          : { result: "failed" }
+      );
+      console.log("Location " + location + " is written in the database");
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
+  });
+
+  app.post("/location/delete", async (req, res) => {
+    try {
+      const id = req.body.id;
+      if (id) {
+        const result = await locationModel.deleteOne({ _id: id });
+        if (result.deletedCount != 0) {
+          res.json({ status: "success" });
+          console.log("\x1b[32m%s\x1b[0m", "Location deleted!");
+        } else {
+          res.json({ status: "failed" });
+          console.log(
+            "\x1b[31m%s\x1b[0m",
+            "Didn't find the location for deletion. ID of the location is " + id
+          );
+        }
+      } else {
+        console.log(
+          "\x1b[31m%s\x1b[0m",
+          "Didn't get the reguest for deletion of location!"
+        );
+        res.json({ status: "request_error" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
+    }
+  });
+
+  app.post("/location/update", async (req, res) => {
+    try {
+      const { _id, location } = req.body;
+
+      if (_id) {
+        const result = await locationModel.updateOne(
+          { _id: _id },
+          { location: location.toUpperCase() }
+        );
+        if (result.modifiedCount != 0) {
+          console.log("\x1b[32m%s\x1b[0m", "Location updated!");
+          res.json({ status: "success" });
+        } else {
+          res.json({ status: "failed" });
+
+          console.log(
+            "\x1b[31m%s\x1b[0m",
+            req.user[0].name +
+              " didn't update the location. ID of the location is " +
+              _id
+          );
+        }
+      } else {
+        console.log(
+          "\x1b[31m%s\x1b[0m",
+          "Didn't get the reguest for updating location!"
+        );
+        res.json({ status: "request_error" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
     }
   });
 

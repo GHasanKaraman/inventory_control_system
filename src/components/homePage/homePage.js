@@ -10,6 +10,7 @@ import {
   LogoutOutlined,
   ToolFilled,
   BookFilled,
+  DatabaseOutlined,
 } from "@ant-design/icons";
 
 import baseRequest from "../../core/baseRequest";
@@ -27,6 +28,7 @@ const items = [
   TagsOutlined,
   ToolFilled,
   BookFilled,
+  DatabaseOutlined,
   LogoutOutlined,
 ].map((icon, index) => ({
   key: index + 1,
@@ -34,8 +36,9 @@ const items = [
   label: [
     "Add New Item",
     "Labels",
-    "Add Technician",
-    "Technician Logs",
+    "Technicians",
+    "Logs",
+    "Locations",
     "Log Out",
   ][index],
 }));
@@ -146,7 +149,7 @@ const homepage = observer(() => {
                 <ProductTable
                   dataSource={data}
                   tagColors={colorData}
-                  onDelete={async (id) => {
+                  onDelete={async (id, image) => {
                     refreshTable(await handleDelete(id));
                   }}
                   onGive={handleGive}
@@ -163,7 +166,7 @@ const homepage = observer(() => {
                           fishbowl: record.fishbowl,
                           tags: record.tags.split(","),
                           id: record._id,
-                          image:record.image
+                          image: record.image,
                         };
 
                         setSelectedModal({ otherKey: 1, product: product });

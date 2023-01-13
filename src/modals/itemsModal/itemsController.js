@@ -38,9 +38,12 @@ const addItem = async (values, form) => {
 };
 
 const updateItem = async (values, id) => {
-  const res = await baseRequest.post("/home/update", { id, ...values });
-
-  console.log(values);
+  const formData = new FormData();
+  for (const name in values) {
+    formData.append(name, values[name]);
+  }
+  formData.append("id", id);
+  const res = await baseRequest.post("/home/update", formData);
 
   if (res.data.status === "success") {
     message.success("Item has been successfully updated!");
@@ -62,6 +65,22 @@ const get_labels = async () => {
     return dataSource;
   } else {
     message.error("Something went wrong while retrieving labels!");
+    return null;
+  }
+};
+
+const get_locations = async () => {
+  const res = await baseRequest.post("/location", {});
+  if (res.data.status === "success") {
+    const records = res.data.records;
+    console.log(records);
+    const dataSource = [];
+    for (let i = 0; i < Object.keys(records).length; i++) {
+      dataSource.push(Object.values(records)[i]);
+    }
+    return dataSource;
+  } else if (res.data.status === "failed") {
+    message.error("Something went wrong while retrieving locations!");
     return null;
   }
 };
@@ -88,4 +107,4 @@ const tagRender = (props) => {
   ) : undefined;
 };
 
-export { addItem, get_labels, tagRender, updateItem };
+export { addItem, get_labels, tagRender, updateItem, get_locations };

@@ -8,6 +8,7 @@ import ItemsModal from "./itemsModal/items";
 import GiveModal from "./giveModal/give";
 import TechnicianModal from "./techniciansModal/technicians";
 import LogModal from "./logsModal/logs";
+import LocationModal from "./locationModal/location";
 
 const ModalRouter = (props) => {
   const navigate = useNavigate();
@@ -18,6 +19,7 @@ const ModalRouter = (props) => {
   const [updateModal, setUpdateModal] = useState(false);
   const [giveModal, setGiveModal] = useState(false);
   const [technicianModal, setTechnicianModal] = useState(false);
+  const [locationModal, setLocationModal] = useState(false);
 
   const hideModal = async () => {
     if (labelsModal) {
@@ -37,6 +39,9 @@ const ModalRouter = (props) => {
     }
     if (logModal) {
       setLogModal(false);
+    }
+    if (locationModal) {
+      setLocationModal(false);
     }
 
     const data = await get_products();
@@ -60,6 +65,9 @@ const ModalRouter = (props) => {
             setLogModal(true);
             break;
           case 5:
+            setLocationModal(true);
+            break;
+          case 6:
             logout();
             navigate("/login");
           default:
@@ -94,6 +102,7 @@ const ModalRouter = (props) => {
     <LabelsModal open={labelsModal} onCancel={hideModal} />,
     <TechnicianModal open={technicianModal} onCancel={hideModal} />,
     <LogModal open={logModal} onCancel={hideModal} />,
+    <LocationModal open={locationModal} onCancel={hideModal} />,
   ];
 
   const otherModals = [
