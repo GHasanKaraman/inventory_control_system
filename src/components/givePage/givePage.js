@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { get_product, giveItem } from "./giveController";
+import { get_product, giveItem, fetchImage } from "./giveController";
 
 import { Row, Col, Form, Button, Input, Select, Image } from "antd";
-import GiveModal from "../../modals/giveModal/give";
 
 const GivePage = (props) => {
   const params = useParams();
 
   const [product, setProduct] = useState(null);
   const [technicians, setTechnicians] = useState([]);
+  const [image, setImage] = useState("");
 
   const [form] = Form.useForm();
 
@@ -18,6 +18,7 @@ const GivePage = (props) => {
   const load_product = async () => {
     const item = await get_product(id);
     form.setFieldsValue(item.resultData);
+    setImage(await fetchImage(item.resultData.image));
     setTechnicians(Object.values(item.records));
     setProduct(item);
   };
@@ -34,12 +35,7 @@ const GivePage = (props) => {
         offset={8}
       >
         <div style={{ textAlign: "center" }}>
-          <Image
-            style={{ marginBottom: "10px" }}
-            preview={false}
-            width={200}
-            src="https://upload.wikimedia.org/wikipedia/commons/3/38/Arduino_Uno_-_R3.jpg"
-          />
+          <Image style={{ marginBottom: "10px" }} width={200} src={image} />
           <Form name="normal-login" onFinish={giveItem} form={form}>
             <Form.Item name="_id" noStyle={true} />
             <Form.Item name="price" noStyle={true} />

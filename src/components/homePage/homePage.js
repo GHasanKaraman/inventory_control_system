@@ -146,7 +146,9 @@ const homepage = observer(() => {
                 <ProductTable
                   dataSource={data}
                   tagColors={colorData}
-                  onDelete={handleDelete}
+                  onDelete={async (id) => {
+                    refreshTable(await handleDelete(id));
+                  }}
                   onGive={handleGive}
                   onRow={(record, _) => {
                     return {
@@ -161,6 +163,7 @@ const homepage = observer(() => {
                           fishbowl: record.fishbowl,
                           tags: record.tags.split(","),
                           id: record._id,
+                          image:record.image
                         };
 
                         setSelectedModal({ otherKey: 1, product: product });

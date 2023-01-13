@@ -9,6 +9,7 @@ import {
   Typography,
   Upload,
   message,
+  Image,
 } from "antd";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 
@@ -75,13 +76,19 @@ const ItemsModal = (props) => {
 
   const uploadButton = (
     <div>
-      {loading ? <LoadingOutlined /> : <PlusOutlined />}
+      {props.product && props.product.image ? (
+        <Image src={props.product.image} preview={false} width={90} />
+      ) : loading ? (
+        <LoadingOutlined />
+      ) : (
+        <PlusOutlined />
+      )}
       <div
         style={{
           marginTop: 8,
         }}
       >
-        Upload
+        {props.product && props.product.image ? null : "Upload"}
       </div>
     </div>
   );
@@ -109,15 +116,35 @@ const ItemsModal = (props) => {
       <Form
         enctype="multipart/form-data"
         name="normal_login"
-        onFinish={(values) => {
+        onFinish={async (values) => {
           values["file"] = file;
-          if (props.type === "add") addItem(values, form);
+          if (props.type === "add") {
+            const status = await addItem(values, form);
+            if (status == "success") {
+              setImageUrl(null);
+            }
+          }
           if (props.type === "update") updateItem(values, id);
         }}
         form={form}
         style={{ marginTop: 30 }}
       >
-        <Form.Item name="file">
+        <Form.Item
+          name="file"
+          rules={[
+            {
+              validator(e, value) {
+                return new Promise((resolve, reject) => {
+                  if (value) {
+                    resolve();
+                  } else {
+                    reject("Please upload the image of the item!");
+                  }
+                });
+              },
+            },
+          ]}
+        >
           <Upload
             rules={[
               { required: true, message: "Please input name of the parts!" },

@@ -18,7 +18,7 @@ const addItem = async (values, form) => {
   values.from_where = from_where.toUpperCase();
   values.new_location = new_location.toUpperCase();
   values.fishbowl = fishbowl.toUpperCase();
-  values.tags = tags.length == 0 ? "NTAG" : tags;
+  values.tags = tags == undefined || tags.length == 0 ? "NTAG" : tags;
 
   const formData = new FormData();
   for (const name in values) {
@@ -26,17 +26,21 @@ const addItem = async (values, form) => {
   }
 
   const response = await baseRequest.post("/items", formData);
-  /*
+
   if (response.data.result === "success") {
     message.success("Item has been successfully added!");
     form.resetFields();
+    return "success";
   } else if (response.data.result === "failed") {
     message.wrong("Something went wrong while adding the item!");
-  }*/
+  }
+  return "failed";
 };
 
 const updateItem = async (values, id) => {
   const res = await baseRequest.post("/home/update", { id, ...values });
+
+  console.log(values);
 
   if (res.data.status === "success") {
     message.success("Item has been successfully updated!");

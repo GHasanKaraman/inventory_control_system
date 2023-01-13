@@ -59,6 +59,8 @@ db.once("open", function () {
     }
   });
 
+  app.use("/uploads", express.static(__dirname + "/uploads"));
+
   app.get("/", async (req, res) => {
     res.send("Listening the port...");
   });
@@ -67,6 +69,9 @@ db.once("open", function () {
     try {
       const { id } = req.body;
       const product = await productModel.findById(id);
+      const host = req.protocol + "://" + req.get("host");
+      product.image = host + "/" + product.image;
+
       if (product) {
         const techs = await technicianModel.find({});
         if (techs) {
@@ -238,6 +243,12 @@ db.once("open", function () {
   app.post("/home", async (req, res) => {
     console.log("Request to loading table...");
     const products = await productModel.find({}, {});
+
+    const host = req.protocol + "://" + req.get("host");
+    for (let i = 0; i < products.length; i++) {
+      products[i].image = host + "/" + products[i].image;
+    }
+
     res.json({
       status: "success",
       records: { ...products },
@@ -499,20 +510,10 @@ db.once("open", function () {
       } = req.body;
 
       price = essentials.numberFormatToEU(price);
+      const image = req.file.path;
 
-      console.log(
-        count,
-        fishbowl,
-        from_where,
-        min_quantity,
-        new_location,
-        parts,
-        price,
-        tags
-      );
-
-      /*
       const result = await productModel.create({
+        image,
         count,
         fishbowl,
         from_where,
@@ -530,7 +531,6 @@ db.once("open", function () {
       } else {
         res.json({ result: "failed" });
       }
-      */
     } catch (e) {
       res.json({ error: e });
       console.log(e);

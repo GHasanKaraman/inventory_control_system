@@ -1,6 +1,15 @@
 import { message } from "antd";
 import baseRequest from "../../core/baseRequest";
 
+const fetchImage = async (imageUrl) => {
+  return fetch(imageUrl)
+    .then((response) => response.blob())
+    .then((imageBlob) => {
+      const imageObjectURL = URL.createObjectURL(imageBlob);
+      return imageObjectURL;
+    });
+};
+
 const get_product = async (id) => {
   const response = await baseRequest.post("/qr", { id: id });
 
@@ -17,4 +26,4 @@ const giveItem = (values) => {
   console.log(values);
 };
 
-export { get_product, giveItem };
+export { get_product, giveItem, fetchImage };

@@ -10,6 +10,7 @@ import {
   Select,
   Popconfirm,
   Dropdown,
+  Image,
 } from "antd";
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
@@ -171,12 +172,30 @@ const ProductTable = (props) => {
 
   const columns = [
     {
+      title: "Image",
+      dataIndex: "image",
+      key: "image",
+      width: "25%",
+      render: (src) => {
+        return (
+          <Image
+            src={src}
+            onClick={(e) => e.stopPropagation()}
+            preview={{
+              onClick: (e) => {
+                e.stopPropagation();
+              },
+            }}
+          />
+        );
+      },
+    },
+    {
       title: "Parts",
       dataIndex: "parts",
       key: "parts",
       width: "25%",
       ...getColumnSearchProps("parts"),
-      onCell: (record, rowIndex) => {},
     },
     {
       title: "Count",
