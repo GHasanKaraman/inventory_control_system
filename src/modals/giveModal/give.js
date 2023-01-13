@@ -1,21 +1,25 @@
 import { useState, useEffect } from "react";
 import { Modal, Form, Input, Button, Select } from "antd";
 
-import { get_technicians, giveItem } from "./giveController";
+import { get_technicians, giveItem, get_locations } from "./giveController";
 
 const GiveModal = (props) => {
-  const [data, setData] = useState([]);
+  const [technicians, setTechnicians] = useState([]);
+  const [locations, setLocations] = useState([]);
 
   const [form] = Form.useForm();
 
-  const load_technicians = async () => {
+  const load_datas = async () => {
     const technicians = await get_technicians();
-    setData(technicians);
+    setTechnicians(technicians);
+
+    const locations = await get_locations();
+    setLocations(locations);
   };
 
   useEffect(() => {
     if (props.open) {
-      load_technicians();
+      load_datas();
       if (props.product) {
         form.setFieldsValue(props.product);
       }
@@ -51,7 +55,7 @@ const GiveModal = (props) => {
         >
           <Select
             placeholder="Who wants?"
-            options={data.map((tech) => {
+            options={technicians.map((tech) => {
               return { value: tech.name };
             })}
           ></Select>
@@ -86,6 +90,28 @@ const GiveModal = (props) => {
           ]}
         >
           <Input placeholder="How many you want?" />
+        </Form.Item>
+        <Form.Item
+          name="source"
+          rules={[{ required: true, message: "Please enter the location!" }]}
+        >
+          <Select
+            placeholder="Source"
+            options={locations.map((loc) => {
+              return { value: loc.location };
+            })}
+          ></Select>
+        </Form.Item>
+        <Form.Item
+          name="target"
+          rules={[
+            {
+              required: true,
+              message: "Please enter where you are taking the item!",
+            },
+          ]}
+        >
+          <Input placeholder="Target" />
         </Form.Item>
         <Form.Item>
           <Button

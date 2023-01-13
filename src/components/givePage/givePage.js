@@ -1,6 +1,11 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import { get_product, giveItem, fetchImage } from "./giveController";
+import {
+  get_product,
+  giveItem,
+  fetchImage,
+  get_locations,
+} from "./giveController";
 
 import { Row, Col, Form, Button, Input, Select, Image } from "antd";
 
@@ -9,6 +14,7 @@ const GivePage = (props) => {
 
   const [product, setProduct] = useState(null);
   const [technicians, setTechnicians] = useState([]);
+  const [locations, setLocations] = useState([]);
   const [image, setImage] = useState("");
 
   const [form] = Form.useForm();
@@ -21,6 +27,7 @@ const GivePage = (props) => {
     setImage(await fetchImage(item.resultData.image));
     setTechnicians(Object.values(item.records));
     setProduct(item);
+    setLocations(Object.values(item.locations));
   };
 
   useEffect(() => {
@@ -91,6 +98,30 @@ const GivePage = (props) => {
               ]}
             >
               <Input placeholder="How many you want?" />
+            </Form.Item>
+            <Form.Item
+              name="source"
+              rules={[
+                { required: true, message: "Please enter the location!" },
+              ]}
+            >
+              <Select
+                placeholder="Source"
+                options={locations.map((loc) => {
+                  return { value: loc.location };
+                })}
+              ></Select>
+            </Form.Item>
+            <Form.Item
+              name="target"
+              rules={[
+                {
+                  required: true,
+                  message: "Please enter where you are taking the item!",
+                },
+              ]}
+            >
+              <Input placeholder="Target" />
             </Form.Item>
             <Form.Item>
               <Button

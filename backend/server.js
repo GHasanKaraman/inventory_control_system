@@ -77,12 +77,19 @@ db.once("open", function () {
       if (product) {
         const techs = await technicianModel.find({});
         if (techs) {
-          res.json({
-            result: "success",
-            resultData: product,
-            records: { ...techs },
-          });
-          console.log("Retrieved technicians!");
+          const locs = await locationModel.find({});
+          if (locs) {
+            res.json({
+              result: "success",
+              resultData: product,
+              records: { ...techs },
+              locations: { ...locs },// remove it, you can do it by disabling it within an input form element!!!!!!!
+            });
+            console.log("Retrieved technicians!");
+          } else {
+            res.json({ result: "failed", resultData: "locations_retrieve" });
+            console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve locations!");
+          }
         } else {
           res.json({ result: "failed", resultData: "technicians_retrieve" });
           console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve technicians!");
