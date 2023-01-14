@@ -1,20 +1,16 @@
 import { useState, useEffect } from "react";
 import { Modal, Form, Input, Button, Select } from "antd";
 
-import { get_technicians, giveItem, get_locations } from "./giveController";
+import { get_technicians, giveItem } from "./giveController";
 
 const GiveModal = (props) => {
   const [technicians, setTechnicians] = useState([]);
-  const [locations, setLocations] = useState([]);
 
   const [form] = Form.useForm();
 
   const load_datas = async () => {
     const technicians = await get_technicians();
     setTechnicians(technicians);
-
-    const locations = await get_locations();
-    setLocations(locations);
   };
 
   useEffect(() => {
@@ -44,6 +40,9 @@ const GiveModal = (props) => {
         <Form.Item name="count" label="Count">
           <Input disabled style={{ color: "black" }} />
         </Form.Item>
+        <Form.Item name="new_location" label="Location">
+          <Input disabled style={{ color: "black" }} />
+        </Form.Item>
         <Form.Item
           name="technician"
           rules={[
@@ -70,6 +69,9 @@ const GiveModal = (props) => {
                     reject("Please enter the count of the item!");
                   }
                   if (!isNaN(value)) {
+                    if (value.includes(".")) {
+                      reject("Please enter an integer");
+                    }
                     if (value <= 0) {
                       reject("Please enter a number greater than 0");
                     } else if (value > form.getFieldValue("count")) {
@@ -90,17 +92,6 @@ const GiveModal = (props) => {
           ]}
         >
           <Input placeholder="How many you want?" />
-        </Form.Item>
-        <Form.Item
-          name="source"
-          rules={[{ required: true, message: "Please enter the location!" }]}
-        >
-          <Select
-            placeholder="Source"
-            options={locations.map((loc) => {
-              return { value: loc.location };
-            })}
-          ></Select>
         </Form.Item>
         <Form.Item
           name="target"

@@ -11,6 +11,7 @@ const labelModel = require("./models/label");
 const technicianModel = require("./models/technician");
 const technicianLogModel = require("./models/technicianLog");
 const locationModel = require("./models/location");
+const qrLogModel = require("./models/qrLog");
 
 var path = require("path");
 const uuid = require("uuid");
@@ -77,25 +78,77 @@ db.once("open", function () {
       if (product) {
         const techs = await technicianModel.find({});
         if (techs) {
-          const locs = await locationModel.find({});
-          if (locs) {
-            res.json({
-              result: "success",
-              resultData: product,
-              records: { ...techs },
-              locations: { ...locs },// remove it, you can do it by disabling it within an input form element!!!!!!!
-            });
-            console.log("Retrieved technicians!");
-          } else {
-            res.json({ result: "failed", resultData: "locations_retrieve" });
-            console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve locations!");
-          }
+          res.json({
+            result: "success",
+            resultData: product,
+            records: { ...techs },
+          });
+          console.log("Retrieved technicians!");
         } else {
           res.json({ result: "failed", resultData: "technicians_retrieve" });
           console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve technicians!");
         }
       } else {
         res.json({ result: "failed", resultData: "product_not_found" });
+      }
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
+  });
+
+  app.post("/qr/give", async (req, res) => {
+    try {
+      let {
+        _id,
+        count,
+        parts,
+        technician,
+        wanted_count,
+        price,
+        new_location,
+        target,
+      } = req.body;
+
+      target = target.toUpperCase();
+
+      const result = await qrLogModel.create({
+        itemID: _id,
+        count,
+        parts,
+        technician,
+        wanted_count,
+        source: new_location,
+        target,
+      });
+      if (result._id) {
+        const productResult = await productModel.updateOne(
+          { _id: _id },
+          {
+            count: count - wanted_count,
+            total_price: ((count - wanted_count) * price).toFixed(2),
+          }
+        );
+
+        res.json(
+          result._id && productResult.modifiedCount != 0
+            ? { result: "success", resultData: result }
+            : { result: "failed" }
+        );
+        console.log(
+          technician +
+            " took " +
+            wanted_count +
+            " out of " +
+            count +
+            " " +
+            parts +
+            " from " +
+            new_location +
+            " to " +
+            target +
+            "!"
+        );
       }
     } catch (e) {
       console.log(e);
@@ -369,8 +422,18 @@ db.once("open", function () {
 
   app.post("/home/give", async (req, res) => {
     try {
-      let { id, count, parts, technician, wanted_count, price } = req.body;
+      let {
+        id,
+        count,
+        parts,
+        technician,
+        wanted_count,
+        price,
+        new_location,
+        target,
+      } = req.body;
       price = essentials.numberFormatToEU(price);
+      target = target.toUpperCase();
       const result = await technicianLogModel.create({
         itemID: id,
         userID: req.user[0]._id,
@@ -378,6 +441,8 @@ db.once("open", function () {
         parts,
         technician,
         wanted_count,
+        source: new_location,
+        target,
       });
       if (result._id) {
         const productResult = await productModel.updateOne(
@@ -403,6 +468,10 @@ db.once("open", function () {
             parts +
             " to " +
             technician +
+            " from " +
+            new_location +
+            " to " +
+            target +
             "!"
         );
       }

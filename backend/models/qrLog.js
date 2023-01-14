@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 
-const technicianLogSchema = new mongoose.Schema({
+const qrLogSchema = new mongoose.Schema({
   technician: { type: String, required: true },
-  userID: { type: mongoose.Types.ObjectId, required: true },
   createdAt: { type: Date, default: () => new Date(), required: true },
   itemID: { type: mongoose.Types.ObjectId, required: true },
   parts: { type: String, required: true },
@@ -12,6 +11,6 @@ const technicianLogSchema = new mongoose.Schema({
   target: { type: String, required: true },
 });
 
-const technicianLog = mongoose.model("technicianLog", technicianLogSchema);
+const qrLog = mongoose.model("qrLog", qrLogSchema);
 
-module.exports = technicianLog;
+module.exports = qrLog;

@@ -1,11 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
-import {
-  get_product,
-  giveItem,
-  fetchImage,
-  get_locations,
-} from "./giveController";
+import { get_product, giveItem, fetchImage } from "./giveController";
 
 import { Row, Col, Form, Button, Input, Select, Image } from "antd";
 
@@ -14,7 +9,6 @@ const GivePage = (props) => {
 
   const [product, setProduct] = useState(null);
   const [technicians, setTechnicians] = useState([]);
-  const [locations, setLocations] = useState([]);
   const [image, setImage] = useState("");
 
   const [form] = Form.useForm();
@@ -27,7 +21,6 @@ const GivePage = (props) => {
     setImage(await fetchImage(item.resultData.image));
     setTechnicians(Object.values(item.records));
     setProduct(item);
-    setLocations(Object.values(item.locations));
   };
 
   useEffect(() => {
@@ -43,13 +36,20 @@ const GivePage = (props) => {
       >
         <div style={{ textAlign: "center" }}>
           <Image style={{ marginBottom: "10px" }} width={200} src={image} />
-          <Form name="normal-login" onFinish={giveItem} form={form}>
+          <Form
+            name="normal-login"
+            onFinish={(values) => giveItem(values, form)}
+            form={form}
+          >
             <Form.Item name="_id" noStyle={true} />
             <Form.Item name="price" noStyle={true} />
             <Form.Item name="parts" label="Parts">
               <Input disabled style={{ color: "black" }} />
             </Form.Item>
             <Form.Item name="count" label="Count">
+              <Input disabled style={{ color: "black" }} />
+            </Form.Item>
+            <Form.Item name="new_location" label="Location">
               <Input disabled style={{ color: "black" }} />
             </Form.Item>
             <Form.Item
@@ -98,19 +98,6 @@ const GivePage = (props) => {
               ]}
             >
               <Input placeholder="How many you want?" />
-            </Form.Item>
-            <Form.Item
-              name="source"
-              rules={[
-                { required: true, message: "Please enter the location!" },
-              ]}
-            >
-              <Select
-                placeholder="Source"
-                options={locations.map((loc) => {
-                  return { value: loc.location };
-                })}
-              ></Select>
             </Form.Item>
             <Form.Item
               name="target"

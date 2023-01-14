@@ -13,12 +13,14 @@ const get_logs = async () => {
       const parts = value.parts;
       const wanted_count = value.wanted_count;
       const count = value.count;
+      const source = value.source;
+      const target = value.target;
       const user_name = Object.values(users).filter(
         (item) => item._id == value.userID
       )[0].name;
       dataSource.push({
         createdAt: value.createdAt,
-        desc: `${user_name} gave ${wanted_count}/${count} ${parts} to ${tech}.`,
+        desc: `${user_name} gave ${wanted_count}/${count} ${parts} to ${tech} from ${source} to ${target}.`,
       });
     }
 

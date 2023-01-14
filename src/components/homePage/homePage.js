@@ -101,6 +101,7 @@ const homepage = observer(() => {
         count: record.count,
         id: record._id,
         price: record.price,
+        new_location: record.new_location,
       },
     });
   };
