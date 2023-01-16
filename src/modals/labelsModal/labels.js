@@ -70,7 +70,7 @@ const LabelsModal = (props) => {
         return <Tag color={label}>{label}</Tag>;
       },
       editable: true,
-      type: "select",
+      type: "colorSelect",
     },
     {
       title: "Action",

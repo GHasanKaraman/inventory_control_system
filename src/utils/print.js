@@ -12,7 +12,7 @@ export default function PrintComponent(props) {
         trigger={() => (
           <Button
             id="button"
-            type="primary"
+            type={props.buttonType}
             onClick={(event) => {
               event.stopPropagation();
             }}

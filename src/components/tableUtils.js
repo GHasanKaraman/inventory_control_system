@@ -15,6 +15,7 @@ import {
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import PrintComponent from "../utils/print";
+import { get_racks } from "../modals/locationModal/locationController";
 
 const { Option } = Select;
 
@@ -287,6 +288,7 @@ const ProductTable = (props) => {
                         }}
                       >
                         <PrintComponent
+                          buttonType="primary"
                           url={(
                             "http://" +
                             window.location.hostname +
@@ -398,10 +400,21 @@ const EditableCell = ({
   ...restProps
 }) => {
   const [editing, setEditing] = useState(false);
+  const [options, setOptions] = useState([]);
   const inputRef = useRef(null);
   const form = useContext(EditableContext);
+
+  const load_racks = async () => {
+    const racks = await get_racks();
+    setOptions(
+      racks.map((opt) => {
+        return { value: opt.rack };
+      })
+    );
+  };
   useEffect(() => {
     if (editing) {
+      load_racks();
       inputRef.current.focus();
     }
   }, [editing]);
@@ -440,7 +453,7 @@ const EditableCell = ({
       >
         {type === "input" ? (
           <Input ref={inputRef} onPressEnter={save} onBlur={save} />
-        ) : (
+        ) : type === "colorSelect" ? (
           <Select
             ref={inputRef}
             onPressEnter={save}
@@ -457,6 +470,14 @@ const EditableCell = ({
               );
             })}
           </Select>
+        ) : (
+          <Select
+            ref={inputRef}
+            onPressEnter={save}
+            onBlur={save}
+            showSearch={true}
+            options={options}
+          ></Select>
         )}
       </Form.Item>
     ) : (

@@ -5,6 +5,7 @@ import { observer, useObserver } from "mobx-react";
 import LoginPage from "../components/loginPage/loginPage";
 import HomePage from "../components/homePage/homePage";
 import GivePage from "../components/givePage/givePage";
+import RackPage from "../components/raclPage/rackPage";
 
 const Pages = observer(() => {
   return useObserver(() => (
@@ -14,6 +15,7 @@ const Pages = observer(() => {
         <Route exact path="/login" element={<LoginPage />} />
         <Route exact path="/home" element={<HomePage />} />
         <Route exact path="/qr/:id" element={<GivePage />} />
+        <Route exact path="/rack/:id" element={<RackPage />} />
       </Routes>
     </Router>
   ));

@@ -1,17 +1,27 @@
-import { Modal, Table, message } from "antd";
+import { Modal, Table, Tabs } from "antd";
 import { useEffect, useState } from "react";
-import { get_logs } from "./logsController";
+import { get_technicianLogs, get_qrLogs } from "./logsController";
 
 const LogModal = (props) => {
-  const [data, setData] = useState([{ desc: "", createdAt: "" }]);
-  const load_logs = async () => {
-    const logs = await get_logs();
-    setData(logs);
+  const [technicianLogs, setTechnicianLogs] = useState([
+    { desc: "", createdAt: "" },
+  ]);
+  const [qrLogs, setQRLogs] = useState([{ desc: "", createdAt: "" }]);
+
+  const load_technicianLogs = async () => {
+    const logs = await get_technicianLogs();
+    setTechnicianLogs(logs);
+  };
+
+  const load_qrLogs = async () => {
+    const logs = await get_qrLogs();
+    setQRLogs(logs);
   };
 
   useEffect(() => {
     if (props.open) {
-      load_logs();
+      load_technicianLogs();
+      load_qrLogs();
     }
   }, [props.open]);
 
@@ -26,6 +36,36 @@ const LogModal = (props) => {
     },
   ];
 
+  const onTabChange = (key) => {
+    console.log(key);
+  };
+
+  const items = [
+    {
+      key: "1",
+      label: `Technician Logs`,
+      children: (
+        <Table
+          columns={defaultColumns}
+          bordered
+          dataSource={technicianLogs}
+        ></Table>
+      ),
+    },
+    {
+      key: "2",
+      label: `QR Scanner Logs`,
+      children: (
+        <Table columns={defaultColumns} bordered dataSource={qrLogs}></Table>
+      ),
+    },
+    {
+      key: "3",
+      label: `Product Logs`,
+      children: <Table></Table>,
+    },
+  ];
+
   return (
     <Modal
       open={props.open}
@@ -34,7 +74,7 @@ const LogModal = (props) => {
       footer={null}
       width={1000}
     >
-      <Table columns={defaultColumns} bordered dataSource={data}></Table>
+      <Tabs defaultActiveKey="1" items={items} onChange={onTabChange} />
     </Modal>
   );
 };
