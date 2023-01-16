@@ -5,7 +5,7 @@ import { observer, useObserver } from "mobx-react";
 import LoginPage from "../components/loginPage/loginPage";
 import HomePage from "../components/homePage/homePage";
 import GivePage from "../components/givePage/givePage";
-import RackPage from "../components/raclPage/rackPage";
+import RackPage from "../components/rackPage/rackPage";
 
 const Pages = observer(() => {
   return useObserver(() => (

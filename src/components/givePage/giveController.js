@@ -16,7 +16,9 @@ const get_product = async (id) => {
   if (response.data.result === "success") {
     return response.data;
   } else if (response.data.result === "failed") {
-    message.error("You have to sign in!");
+    if (response.data.resultData === "product_not_found") {
+      return null;
+    }
   }
 
   return null;

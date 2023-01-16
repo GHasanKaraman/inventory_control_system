@@ -74,9 +74,9 @@ db.once("open", function () {
       const { id } = req.body;
       const product = await productModel.findById(id);
       const host = req.protocol + "://" + req.get("host");
-      product.image = host + "/" + product.image;
 
       if (product) {
+        product.image = host + "/" + product.image;
         const techs = await technicianModel.find({});
         if (techs) {
           res.json({
@@ -154,6 +154,71 @@ db.once("open", function () {
     } catch (e) {
       console.log(e);
       res.json({ error: e });
+    }
+  });
+
+  app.post("/qr/rack", async (req, res) => {
+    try {
+      const { _id } = req.body;
+      const labels = await labelModel.find({});
+      const locs = await locationModel.find({});
+      const racks = await rackModel.find({ _id: _id });
+      if (labels && locs && racks) {
+        res.json({
+          status: "success",
+          labels: labels,
+          locations: locs,
+          racks: racks,
+        });
+        console.log("Retrieved datas!");
+      } else {
+        res.json({ status: "failed" });
+        console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve datas!");
+      }
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
+  });
+
+  app.post("/qr/rack/add", upload.single("file"), async (req, res) => {
+    try {
+      let {
+        count,
+        fishbowl,
+        from_where,
+        min_quantity,
+        new_location,
+        parts,
+        price,
+        tags,
+      } = req.body;
+
+      price = essentials.numberFormatToEU(price);
+      const image = req.file.path;
+
+      const result = await productModel.create({
+        image,
+        count,
+        fishbowl,
+        from_where,
+        min_quantity,
+        new_location,
+        parts,
+        price: price.toFixed(2),
+        tags,
+        total_price: (price * count).toFixed(2),
+      });
+
+      if (result._id) {
+        console.log(req.socket.remoteAddress + " added " + parts + " product!");
+        res.json({ result: "success", resultData: result });
+      } else {
+        res.json({ result: "failed" });
+      }
+    } catch (e) {
+      res.json({ error: e });
+      console.log(e);
     }
   });
 
