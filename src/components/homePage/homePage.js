@@ -11,6 +11,7 @@ import {
   ToolFilled,
   BookFilled,
   DatabaseOutlined,
+  CarOutlined,
 } from "@ant-design/icons";
 
 import baseRequest from "../../core/baseRequest";
@@ -29,6 +30,7 @@ const items = [
   ToolFilled,
   BookFilled,
   DatabaseOutlined,
+  CarOutlined,
   LogoutOutlined,
 ].map((icon, index) => ({
   key: index + 1,
@@ -39,6 +41,7 @@ const items = [
     "Technicians",
     "Logs",
     "Locations",
+    "Orders",
     "Log Out",
   ][index],
 }));
