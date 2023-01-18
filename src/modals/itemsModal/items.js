@@ -137,7 +137,7 @@ const ItemsModal = (props) => {
               setImageUrl(null);
             }
           }
-          if (props.type === "update") updateItem(values, id);
+          if (props.type === "update") await updateItem(values, id);
         }}
         form={form}
         style={{ marginTop: 30 }}

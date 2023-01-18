@@ -1,4 +1,4 @@
-import { Modal, Table, Tabs } from "antd";
+import { Modal, Table, Tabs, Result } from "antd";
 import { useEffect, useState } from "react";
 import { get_technicianLogs, get_qrLogs } from "./logsController";
 
@@ -43,7 +43,7 @@ const LogModal = (props) => {
   const items = [
     {
       key: "1",
-      label: `Technician Logs`,
+      label: `User Activity Logs`,
       children: (
         <Table
           columns={defaultColumns}
@@ -54,7 +54,7 @@ const LogModal = (props) => {
     },
     {
       key: "2",
-      label: `QR Scanner Logs`,
+      label: `QR Logs`,
       children: (
         <Table columns={defaultColumns} bordered dataSource={qrLogs}></Table>
       ),
@@ -62,7 +62,12 @@ const LogModal = (props) => {
     {
       key: "3",
       label: `Product Logs`,
-      children: <Table></Table>,
+      children: (
+        <Result
+          title="This feature will be on v1.1"
+          subTitle="System needs some data to open this feature."
+        />
+      ),
     },
   ];
 

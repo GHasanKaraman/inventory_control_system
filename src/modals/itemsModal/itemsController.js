@@ -73,7 +73,6 @@ const get_locations = async () => {
   const res = await baseRequest.post("/location", {});
   if (res.data.status === "success") {
     const records = res.data.records;
-    console.log(records);
     const dataSource = [];
     for (let i = 0; i < Object.keys(records).length; i++) {
       dataSource.push(Object.values(records)[i]);

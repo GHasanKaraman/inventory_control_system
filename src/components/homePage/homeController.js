@@ -1,14 +1,6 @@
 import { message } from "antd";
 import baseRequest from "../../core/baseRequest";
-
-const fetchImage = async (imageUrl) => {
-  return fetch(imageUrl)
-    .then((response) => response.blob())
-    .then((imageBlob) => {
-      const imageObjectURL = URL.createObjectURL(imageBlob);
-      return imageObjectURL;
-    });
-};
+import { fetchImage } from "../../utils/img2blob";
 
 const get_products = async (response) => {
   const res = response ? response : await baseRequest.post("/home", {});

@@ -317,7 +317,8 @@ db.once("open", function () {
       "/rack/delete" ||
       "/rack/update" ||
       "/logs/technicians" ||
-      "/logs/qr"
+      "/logs/qr" ||
+      "/order"
     ) {
       try {
         const token = req.header("Authorization");
@@ -378,7 +379,7 @@ db.once("open", function () {
 
   app.post("/home", async (req, res) => {
     console.log("Request to loading table...");
-    const products = await productModel.find({}, {});
+    const products = await productModel.find({ status: "INVENTORY" }, {});
 
     const host = req.protocol + "://" + req.get("host");
     for (let i = 0; i < products.length; i++) {
@@ -666,6 +667,7 @@ db.once("open", function () {
         parts,
         price,
         tags,
+        status,
       } = req.body;
 
       price = essentials.numberFormatToEU(price);
@@ -682,6 +684,7 @@ db.once("open", function () {
         price: price.toFixed(2),
         tags,
         total_price: (price * count).toFixed(2),
+        status,
       });
 
       if (result._id) {
@@ -1015,6 +1018,24 @@ db.once("open", function () {
       res.json({ error: e });
       console.log(e);
     }
+  });
+
+  app.post("/order", async (req, res) => {
+    console.log("Request to orders list ..");
+    const products = await productModel.find(
+      { status: { $ne: "INVENTORY" } },
+      {}
+    );
+
+    const host = req.protocol + "://" + req.get("host");
+    for (let i = 0; i < products.length; i++) {
+      products[i].image = host + "/" + products[i].image;
+    }
+
+    res.json({
+      status: "success",
+      records: { ...products },
+    });
   });
 
   app.listen(process.env.PORT, (req, res) => {

@@ -11,6 +11,7 @@ const productSchema = new mongoose.Schema({
   new_location: { type: String, required: true },
   tags: { type: String, default: "NTAG" },
   fishbowl: { type: String, required: true },
+  status: { type: String, default: "INVENTORY" },
 });
 
 const product = mongoose.model("product", productSchema);
