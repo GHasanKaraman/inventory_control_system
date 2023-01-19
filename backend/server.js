@@ -293,6 +293,31 @@ db.once("open", function () {
   }
 
   app.use(async (req, res, next) => {
+    require("dns").resolve("www.google.com", function (err) {
+      if (err) {
+        const txt = String.raw`
+
+                       ______
+                    .-"      "-.
+                   /            \
+       _          |              |          _
+      ( \         |,  .-.  .-.  ,|         / )
+       > "=._     | )(__/  \__)( |     _.=" <
+      (_/"=._"=._ |/     /\     \| _.="_.="\_)
+             "=._ (_     ^^     _)"_.="
+                 "=\__|IIIIII|__/="
+                _.="| \IIIIII/ |"=._
+      _     _.="_.="\          /"=._"=._     _
+     ( \_.="_.="     '--------'     "=._"=._/ )
+      > _.="                            "=._ <
+     (_/                                    \_)
+        
+     `;
+        console.log("\x1b[31m%s\x1b[0m", txt);
+        console.log("\x1b[31m%s\x1b[0m", "NO INTERNET CONNECTION");
+      }
+    });
+
     if (
       req.url == "/home" ||
       "/home/update" ||
@@ -325,13 +350,13 @@ db.once("open", function () {
       try {
         const token = req.header("Authorization");
         if (token) {
-          console.log("\x1b[35m%s\x1b[0m", token + " will be authenticated!");
           const tokenData = await tokenModel
             .find({ token: token })
             .sort({ createdAt: -1 })
             .limit(1);
 
           if (!isEmpty(tokenData)) {
+            console.log("\x1b[35m%s\x1b[0m", token + " will be authenticated!");
             if (
               Math.abs(new Date() - tokenData[0].createdAt) / (1000 * 60) >=
               60 * 24

@@ -1,3 +1,4 @@
+import { message } from "antd";
 import axios from "axios";
 
 const baseUrl = "http://10.12.9.63:4000";
@@ -5,13 +6,17 @@ const baseUrl = "http://10.12.9.63:4000";
 
 const baseRequest = {
   request: (method, path, params, responseType) => {
-    return axios({ method, url: baseUrl + path, data: params, responseType })
-      .then((result) => {
-        return result;
-      })
-      .catch((error) => {
-        return error;
-      });
+    if (!window.navigator.onLine) {
+      message.error("No internet!");
+    } else {
+      return axios({ method, url: baseUrl + path, data: params, responseType })
+        .then((result) => {
+          return result;
+        })
+        .catch((error) => {
+          return error;
+        });
+    }
   },
   multiPartPost: (path, form) => {
     return axios.post(baseUrl + path, form, {

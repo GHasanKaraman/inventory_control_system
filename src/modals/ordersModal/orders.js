@@ -30,7 +30,6 @@ import {
 import OrderDetailsModal from "../orderDetailsModal/orderDetails";
 
 const OrdersModal = (props) => {
-  const [data, setData] = useState([]);
   const [options, setOptions] = useState([{ value: "gold" }]);
   const [orders, setOrders] = useState([{ title: "N/A" }]);
 
@@ -47,21 +46,16 @@ const OrdersModal = (props) => {
     const labels = await get_labels();
     setOptions(labels);
   };
-  const load_locations = async () => {
-    const locations = await get_locations();
-    setData(locations);
-  };
 
   const load_orders = async () => {
-    const _orders = get_orders();
-    _orders.then(setOrders);
+    const orders = await get_orders();
+    setOrders(orders);
   };
 
   useEffect(() => {
     if (props.open) {
       load_orders();
       load_items();
-      load_locations();
     }
   }, [props.open]);
 

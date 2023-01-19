@@ -57,7 +57,7 @@ const get_orders = async () => {
       values[i].status = st2cr(values[i].status);
     }
     return values;
-  } else {
+  } else if (response.data.status === "failed") {
     message.error("Something went wrong while retrieving orders! Try again.");
     return null;
   }
