@@ -21,6 +21,7 @@ import ModalRouter from "../../modals/modalRouter";
 
 import { ProductTable } from "../tableUtils";
 import { get_products, handleDelete, get_colors } from "./homeController";
+import { openNotifications } from "./notifications";
 
 const { Sider, Content } = Layout;
 
@@ -59,6 +60,7 @@ const homepage = observer(() => {
   useEffect(() => {
     load_colors();
     loadHomePage();
+    openNotifications();
   }, []);
 
   const load_products = async (res) => {
