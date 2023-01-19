@@ -318,7 +318,9 @@ db.once("open", function () {
       "/rack/update" ||
       "/logs/technicians" ||
       "/logs/qr" ||
-      "/order"
+      "/order" ||
+      "/order/step-up" ||
+      "/order/transfer"
     ) {
       try {
         const token = req.header("Authorization");
@@ -1036,6 +1038,47 @@ db.once("open", function () {
       status: "success",
       records: { ...products },
     });
+  });
+
+  app.post("/order/step-up", async (req, res) => {
+    try {
+      const { _id, status } = req.body;
+      const result = await productModel.updateOne(
+        { _id: _id },
+        { status: status }
+      );
+      if (result.modifiedCount != 0) {
+        console.log(req.user[0].name + " stepped up " + _id + " to " + status);
+        res.json({ result: "success" });
+      } else {
+        res.json({ result: "failed" });
+        console.log("Nothing changed about stepping up!");
+      }
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
+  });
+
+  app.post("/order/transfer", async (req, res) => {
+    try {
+      const { id, values } = req.body;
+      const result = await productModel.updateOne(
+        { _id: id },
+        { ...values, status: "INVENTORY" }
+      );
+      console.log({ ...values, status: "INVENTORY" });
+      if (result.modifiedCount != 0) {
+        console.log(req.user[0].name + " transfered the order");
+        res.json({ result: "success" });
+      } else {
+        console.log("Something went wrong while transfering the order!");
+        res.json({ result: "failed" });
+      }
+    } catch (e) {
+      console.log(e);
+      res.json({ error: e });
+    }
   });
 
   app.listen(process.env.PORT, (req, res) => {

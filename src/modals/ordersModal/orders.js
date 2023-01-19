@@ -27,11 +27,15 @@ import {
   step_up,
   delete_order,
 } from "./ordersController";
+import OrderDetailsModal from "../orderDetailsModal/orderDetails";
 
 const OrdersModal = (props) => {
   const [data, setData] = useState([]);
   const [options, setOptions] = useState([{ value: "gold" }]);
   const [orders, setOrders] = useState([{ title: "N/A" }]);
+
+  const [detailsModal, setDetailsModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState({});
 
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
@@ -125,7 +129,7 @@ const OrdersModal = (props) => {
       label: `Add Order`,
       children: (
         <Form
-          enctype="multipart/form-data"
+          encType="multipart/form-data"
           name="normal_login"
           onFinish={async (values) => {
             values["file"] = file;
@@ -267,51 +271,6 @@ const OrdersModal = (props) => {
           >
             <Input placeholder="Vendor" />
           </Form.Item>
-          <Form.Item
-            name="min_quantity"
-            rules={[
-              {
-                validator(_, value) {
-                  return new Promise((resolve, reject) => {
-                    if (!value) {
-                      reject("Please enter min quantity!");
-                    }
-                    if (value.includes(".")) {
-                      reject("Please enter an integer!");
-                    }
-                    if (!isNaN(value)) {
-                      if (value < 0) {
-                        reject("Please enter a number greater than 0");
-                      } else {
-                        resolve();
-                      }
-                    } else {
-                      reject("Please enter a number!");
-                    }
-                  });
-                },
-              },
-            ]}
-          >
-            <Input placeholder="Min Quantity" />
-          </Form.Item>
-          <Form.Item
-            name="new_location"
-            rules={[{ required: true, message: "Please enter the location!" }]}
-          >
-            <Select
-              placeholder="Location"
-              options={data.map((loc) => {
-                return { value: loc.location };
-              })}
-            ></Select>
-          </Form.Item>
-          <Form.Item
-            name="fishbowl"
-            rules={[{ required: true, message: "Please enter Fishbowl code!" }]}
-          >
-            <Input placeholder="Fishbowl" />
-          </Form.Item>
           <Form.Item name="tags" required>
             <Select
               maxTagCount={4}
@@ -365,8 +324,14 @@ const OrdersModal = (props) => {
                   <Button
                     type="link"
                     key="list-loadmore-edit"
-                    onClick={() => {
-                      step_up(item);
+                    onClick={async () => {
+                      if (item.status != 2) {
+                        await step_up(item);
+                      } else {
+                        setDetailsModal(true);
+                        setSelectedItem(item);
+                      }
+                      load_orders();
                     }}
                   >
                     Step
@@ -375,6 +340,7 @@ const OrdersModal = (props) => {
                     title="Sure to delete?"
                     onConfirm={async () => {
                       await delete_order(item._id);
+                      load_orders();
                     }}
                   >
                     <Button type="link" key="list-loadmore-more">
@@ -421,14 +387,22 @@ const OrdersModal = (props) => {
       footer={null}
       width="35%"
     >
-      <span
-        onClick={() => {
-          console.log(orders);
+      <Tabs
+        items={tabs}
+        onTabClick={(e) => {
+          if (e == 2) {
+            load_orders();
+          }
         }}
-      >
-        Click
-      </span>
-      <Tabs items={tabs}></Tabs>
+      ></Tabs>
+      <OrderDetailsModal
+        item={selectedItem}
+        reload={load_orders}
+        open={detailsModal}
+        onCancel={() => {
+          setDetailsModal(false);
+        }}
+      />
     </Modal>
   );
 };

@@ -3,25 +3,16 @@ import baseRequest from "../../core/baseRequest";
 import { fetchImage } from "../../utils/img2blob";
 
 const addOrder = async (values, form) => {
-  let {
-    file,
-    count,
-    fishbowl,
-    from_where,
-    min_quantity,
-    new_location,
-    parts,
-    price,
-    tags,
-    status,
-  } = values;
+  let { file, count, from_where, parts, price, tags, status } = values;
 
   values.parts = parts.toUpperCase();
   values.from_where = from_where.toUpperCase();
-  values.new_location = new_location.toUpperCase();
-  values.fishbowl = fishbowl.toUpperCase();
   values.tags = tags == undefined || tags.length == 0 ? "NTAG" : tags;
   values.status = status.toUpperCase();
+
+  values.fishbowl = "X";
+  values.new_location = "X";
+  values.min_quantity = -1;
 
   const formData = new FormData();
   for (const name in values) {
@@ -45,6 +36,17 @@ function st2cr(status) {
   if (status === "DELIVERED") return 2;
 }
 
+function cr2st(current) {
+  switch (current) {
+    case 0:
+      return "ORDERED";
+    case 1:
+      return "DELIVERY";
+    case 2:
+      return "DELIVERED";
+  }
+}
+
 const get_orders = async () => {
   const response = await baseRequest.post("/order", {});
   if (response.data.status === "success") {
@@ -62,8 +64,25 @@ const get_orders = async () => {
 };
 
 const step_up = async (item) => {
-  const response = await baseRequest.post("/order/step-up");
+  let { _id, status } = item;
+  status = cr2st(status + 1);
+
+  const response = await baseRequest.post("/order/step-up", { _id, status });
+  if (response.data.result === "success") {
+    message.success("You have successfully updated the status!");
+  } else {
+    message.error("Something went wrong while updating the status!");
+  }
 };
-const delete_order = async (id) => {};
+const delete_order = async (id) => {
+  const res = await baseRequest.post("/home/delete", { id: id });
+  if (res.data.status === "success") {
+    message.success("Order has been successfully deleted!");
+  } else if (res.data.status === "failed!") {
+    message.error("Didn't delete the order!");
+  } else {
+    message.error("Server didn't get the request properly!");
+  }
+};
 
 export { addOrder, get_orders, step_up, delete_order };
