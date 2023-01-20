@@ -136,6 +136,7 @@ const homepage = observer(() => {
             <ModalRouter
               selectedIndex={selectedModal}
               refreshTable={refreshTable}
+              refresh={load_products}
             />
           </Sider>
 

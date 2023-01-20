@@ -134,6 +134,7 @@ const ItemsModal = (props) => {
           if (props.type === "add") {
             const status = await addItem(values, form);
             if (status == "success") {
+              props.refresh();
               setImageUrl(null);
             }
           }

@@ -101,6 +101,7 @@ const ModalRouter = (props) => {
   const menuModals = [
     <div />,
     <ItemsModal
+      refresh={props.refresh}
       type="add"
       open={registerModal}
       onCancel={hideModal}
