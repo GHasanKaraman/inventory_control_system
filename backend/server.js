@@ -357,8 +357,10 @@ db.once("open", function () {
 
           if (!isEmpty(tokenData)) {
             console.log("\x1b[35m%s\x1b[0m", token + " will be authenticated!");
+            var date = new Date();
+            date.setHours(date.getHours() - 5);
             if (
-              Math.abs(new Date() - tokenData[0].createdAt) / (1000 * 60) >=
+              Math.abs(date - tokenData[0].createdAt) / (1000 * 60) >=
               60 * 24
             ) {
               console.log(
