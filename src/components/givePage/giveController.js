@@ -24,13 +24,14 @@ const get_product = async (id) => {
   return null;
 };
 
-const giveItem = async (values, form) => {
+const giveItem = async (values) => {
   const res = await baseRequest.post("/qr/give", values);
   if (res.data.result === "success") {
     message.success("You can take the items!");
-    form.setFieldsValue({ technician: null, wanted_count: null, target: null });
+    return "success";
   } else if (res.data.status === "failed") {
     message.error("Something went wrong while giving the item!");
+    return "failed";
   }
 };
 

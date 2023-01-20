@@ -11,6 +11,9 @@ const GivePage = (props) => {
   const [technicians, setTechnicians] = useState([]);
   const [image, setImage] = useState("");
 
+  const [buttonColor, setButtonColor] = useState(undefined);
+  const [buttonText, setButtonText] = useState("Give");
+
   const [form] = Form.useForm();
 
   const { id } = params;
@@ -51,7 +54,22 @@ const GivePage = (props) => {
             <Image style={{ marginBottom: "10px" }} width={200} src={image} />
             <Form
               name="normal-login"
-              onFinish={(values) => giveItem(values, form)}
+              onFinish={async (values) => {
+                const result = await giveItem(values);
+                if (result === "success") {
+                  setButtonColor("#227C70");
+                  setButtonText("You can take the item.");
+                } else {
+                  setButtonColor("red");
+                  setButtonText("You cannot take the item!");
+                }
+                form.resetFields();
+                setTimeout(() => {
+                  setButtonColor(undefined);
+                  setButtonText("Give");
+                }, 2000);
+                await load_product();
+              }}
               form={form}
             >
               <Form.Item name="_id" noStyle={true} />
@@ -91,6 +109,9 @@ const GivePage = (props) => {
                           reject("Please enter the count of the item!");
                         }
                         if (!isNaN(value)) {
+                          if (form.getFieldValue("count") == 0) {
+                            reject("This item is out of stock!");
+                          }
                           if (value <= 0) {
                             reject("Please enter a number greater than 0");
                           } else if (value > form.getFieldValue("count")) {
@@ -125,11 +146,12 @@ const GivePage = (props) => {
               </Form.Item>
               <Form.Item>
                 <Button
+                  style={{ backgroundColor: buttonColor }}
                   type="primary"
                   htmlType="submit"
                   className="login-form-button"
                 >
-                  Give
+                  {buttonText}
                 </Button>
               </Form.Item>
             </Form>
