@@ -5,7 +5,6 @@ const addItem = async (values, form) => {
   let {
     file,
     count,
-    fishbowl,
     from_where,
     min_quantity,
     new_location,
@@ -17,7 +16,6 @@ const addItem = async (values, form) => {
   values.parts = parts.toUpperCase();
   values.from_where = from_where.toUpperCase();
   values.new_location = new_location.toUpperCase();
-  values.fishbowl = fishbowl.toUpperCase();
   values.tags = tags == undefined || tags.length == 0 ? "NTAG" : tags;
 
   const formData = new FormData();

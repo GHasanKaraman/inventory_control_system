@@ -10,7 +10,6 @@ const addOrder = async (values, form) => {
   values.tags = tags == undefined || tags.length == 0 ? "NTAG" : tags;
   values.status = status.toUpperCase();
 
-  values.fishbowl = "X";
   values.new_location = "X";
   values.min_quantity = -1;
 

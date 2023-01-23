@@ -185,7 +185,6 @@ db.once("open", function () {
     try {
       let {
         count,
-        fishbowl,
         from_where,
         min_quantity,
         new_location,
@@ -200,7 +199,6 @@ db.once("open", function () {
       const result = await productModel.create({
         image,
         count,
-        fishbowl,
         from_where,
         min_quantity,
         new_location,
@@ -455,7 +453,6 @@ db.once("open", function () {
       let {
         id,
         count,
-        fishbowl,
         from_where,
         min_quantity,
         new_location,
@@ -465,14 +462,12 @@ db.once("open", function () {
       } = req.body;
 
       price = essentials.numberFormatToEU(price);
-      fishbowl = fishbowl.toUpperCase();
       from_where = from_where.toUpperCase();
       new_location = new_location.toUpperCase();
       parts = parts.toUpperCase();
 
       const pipeline = {
         count,
-        fishbowl,
         from_where,
         min_quantity,
         new_location,
@@ -689,7 +684,6 @@ db.once("open", function () {
     try {
       let {
         count,
-        fishbowl,
         from_where,
         min_quantity,
         new_location,
@@ -705,7 +699,6 @@ db.once("open", function () {
       const result = await productModel.create({
         image,
         count,
-        fishbowl,
         from_where,
         min_quantity,
         new_location,

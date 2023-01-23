@@ -318,14 +318,6 @@ const RackPage = (props) => {
                   })}
                 ></Select>
               </Form.Item>
-              <Form.Item
-                name="fishbowl"
-                rules={[
-                  { required: true, message: "Please enter Fishbowl code!" },
-                ]}
-              >
-                <Input placeholder="Fishbowl" />
-              </Form.Item>
               <Form.Item name="tags" required>
                 <Select
                   maxTagCount={4}

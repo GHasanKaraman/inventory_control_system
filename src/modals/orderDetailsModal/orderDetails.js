@@ -80,12 +80,6 @@ const OrderDetailsModal = (props) => {
             })}
           ></Select>
         </Form.Item>
-        <Form.Item
-          name="fishbowl"
-          rules={[{ required: true, message: "Please enter Fishbowl code!" }]}
-        >
-          <Input placeholder="Fishbowl" />
-        </Form.Item>
         <Form.Item>
           <Button
             type="primary"

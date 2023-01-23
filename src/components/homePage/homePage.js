@@ -170,7 +170,6 @@ const homepage = observer(() => {
                           from_where: record.from_where,
                           min_quantity: record.min_quantity,
                           new_location: record.new_location,
-                          fishbowl: record.fishbowl,
                           tags: record.tags.split(","),
                           id: record._id,
                           image: record.image,

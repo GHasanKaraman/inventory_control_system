@@ -250,13 +250,6 @@ const ProductTable = (props) => {
       ...getColumnSearchProps("new_location"),
     },
     {
-      title: "Fishbowl",
-      dataIndex: "fishbowl",
-      key: "fishbowl",
-      width: "1%",
-      ...getColumnSearchProps("fishbowl"),
-    },
-    {
       title: "Tags",
       dataIndex: "tags",
       key: "tags",
