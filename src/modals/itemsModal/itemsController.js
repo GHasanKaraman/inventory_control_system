@@ -18,6 +18,8 @@ const addItem = async (values, form) => {
   values.new_location = new_location.toUpperCase();
   values.tags = tags == undefined || tags.length == 0 ? "NTAG" : tags;
 
+  console.log(values.tags);
+
   const formData = new FormData();
   for (const name in values) {
     formData.append(name, values[name]);
@@ -36,6 +38,13 @@ const addItem = async (values, form) => {
 };
 
 const updateItem = async (values, id) => {
+  console.log(values.tags);
+  if (values.tags.length > 1 && values.tags[0] === "NTAG") {
+    values.tags.splice(0, 1);
+  } else if (values.tags.length == 0) {
+    values.tags = ["NTAG"];
+  }
+
   const formData = new FormData();
   for (const name in values) {
     formData.append(name, values[name]);
