@@ -98,30 +98,29 @@ const LocationModal = (props) => {
     {
       title: "Action",
       dataIndex: "operation",
-      render: (_, record) =>
-        locations.length >= 1 ? (
-          <Space>
-            <PrintComponent
-              buttonType="primary"
-              url={(
-                "http://" +
-                window.location.hostname +
-                `:${window.location.port}/rack/${record._id}`
-              ).trim()}
-              part={record.rack}
-              location={""}
-            />
-            <Popconfirm
-              title="Sure to delete?"
-              onConfirm={async () => {
-                await deleteRack(record._id);
-                await load_racks();
-              }}
-            >
-              <a>Delete</a>
-            </Popconfirm>
-          </Space>
-        ) : null,
+      render: (_, record) => (
+        <Space>
+          <PrintComponent
+            buttonType="primary"
+            url={(
+              "http://" +
+              window.location.hostname +
+              `:${window.location.port}/rack/${record._id}`
+            ).trim()}
+            part={record.rack}
+            location={""}
+          />
+          <Popconfirm
+            title="Sure to delete?"
+            onConfirm={async () => {
+              await deleteRack(record._id);
+              await load_racks();
+            }}
+          >
+            <a>Delete</a>
+          </Popconfirm>
+        </Space>
+      ),
     },
   ];
 
