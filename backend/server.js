@@ -877,7 +877,7 @@ db.once("open", function () {
   });
 
   app.post("/location", async (req, res) => {
-    const locs = await locationModel.aggregate([
+    /*const locs = await locationModel.aggregate([
       {
         $lookup: {
           from: "products",
@@ -891,8 +891,8 @@ db.once("open", function () {
           matched_docs: { $eq: [] },
         },
       },
-    ]);
-    //const locs = await locationModel.find({});
+    ]);*/
+    const locs = await locationModel.find({});
     if (locs) {
       res.json({
         status: "success",
