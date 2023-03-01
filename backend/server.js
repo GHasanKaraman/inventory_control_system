@@ -42,10 +42,23 @@ db.once("open", function () {
   app.use(bodyParser.json());
   app.use(cors());
 
-  var accessLogStream = fs.createWriteStream("./access.log", { flags: "a" });
-  app.use(
-    morgan(
-      function (tokens, req, res) {
+  if (process.env.NODE_ENV == "production") {
+    var accessLogStream = fs.createWriteStream("./access.log", { flags: "a" });
+    app.use(
+      morgan({
+        format:
+          "[:date[clf]] :remote-addr :method :url :status :response-time ms",
+        stream: {
+          write: function (str) {
+            accessLogStream.write(str);
+            console.log(str);
+          },
+        },
+      })
+    );
+  } else {
+    app.use(
+      morgan(function (tokens, req, res) {
         return [
           "\n",
           chalk.hex("#ff4757").bold("🍄  Morgan --> "),
@@ -59,17 +72,9 @@ db.once("open", function () {
           chalk.hex("#1e90ff")(tokens["user-agent"](req, res)),
           "\n",
         ].join(" ");
-      },
-      {
-        stream: {
-          write: function (str) {
-            accessLogStream.write(str);
-            console.log(str);
-          },
-        },
-      }
-    )
-  );
+      })
+    );
+  }
 
   app.use((req, res, next) => {
     if ("OPTIONS" === req.method) {
