@@ -11,7 +11,7 @@ const openNotifications = async () => {
       duration: 0,
     });
   }
-
+  return {};
   const products = await get_products();
 
   Object.values(products).map((item) => {

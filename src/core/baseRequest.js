@@ -32,12 +32,15 @@ const baseRequest = {
     return baseRequest.request("GET", path, params);
   },
   addHeader: (data) => {
+    console.log("addHeader", data);
     axios.defaults.headers.common["Authorization"] = "Header " + data;
   },
   addToken: (token) => {
     const sessiontoken = localStorage.getItem("token");
+    console.log("AddToken", sessiontoken, token);
     axios.defaults.headers.common["Authorization"] = token || sessiontoken;
   },
 };
+console.log("baseRequest");
 baseRequest.addToken();
 export default baseRequest;

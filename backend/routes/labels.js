@@ -3,7 +3,7 @@ const router = express.Router();
 
 const labelModel = require("../models/label");
 
-router.post("/labels", async (req, res) => {
+router.post("/", async (req, res) => {
   let labels = await labelModel.find({});
   if (labels) {
     res.json({
@@ -17,7 +17,7 @@ router.post("/labels", async (req, res) => {
   }
 });
 
-router.post("/labels/add", async (req, res) => {
+router.post("/add", async (req, res) => {
   try {
     const { label, color } = req.body;
     const result = await labelModel.create({
@@ -36,7 +36,7 @@ router.post("/labels/add", async (req, res) => {
   }
 });
 
-router.post("/labels/delete", async (req, res) => {
+router.post("/delete", async (req, res) => {
   try {
     const id = req.body.id;
     if (id) {
@@ -61,7 +61,7 @@ router.post("/labels/delete", async (req, res) => {
   }
 });
 
-router.post("/labels/update", async (req, res) => {
+router.post("/update", async (req, res) => {
   try {
     const { _id, name, color } = req.body;
 

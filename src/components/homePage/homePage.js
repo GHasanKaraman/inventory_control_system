@@ -1,6 +1,5 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { observer } from "mobx-react";
 import { useNavigate } from "react-router-dom";
 
 import { ConfigProvider, Layout, Menu, message, Typography } from "antd";
@@ -15,13 +14,13 @@ import {
 } from "@ant-design/icons";
 
 import baseRequest from "../../core/baseRequest";
-import { useStore } from "../../stores/useStore";
 
 import ModalRouter from "../../modals/modalRouter";
 
 import { ProductTable } from "../tableUtils";
 import { get_products, handleDelete, get_colors } from "./homeController";
 import { openNotifications } from "./notifications";
+import userAuth from "../../utils/userAuth.js";
 
 const { Sider, Content } = Layout;
 
@@ -47,9 +46,7 @@ const items = [
   ][index],
 }));
 
-const homepage = observer(() => {
-  const { userStore } = useStore();
-
+const HomePage = (props) => {
   const [selectedModal, setSelectedModal] = useState();
   const [user, setUser] = useState();
   const [data, setData] = useState();
@@ -74,27 +71,14 @@ const homepage = observer(() => {
   };
 
   const loadHomePage = async () => {
-    const status = userStore.control();
+    const res = await baseRequest.post("/home", {});
+    const status = userAuth.control(res);
     if (status) {
-      const res = await baseRequest.post("/home", {});
-      if (res.data.status === "token_error") {
-        localStorage.removeItem("token");
-        navigate("/login");
-      } else if (res.data.status === "token_expired") {
-        localStorage.removeItem("token");
-        navigate("/login");
-        message.error("Your session has expired! Please sign in again.");
-      } else if (res.data.status === "user_not_found") {
-        localStorage.removeItem("token");
-        navigate("/login");
-        message.error("Your session has expired! Please sign in again.");
-      } else if (res.data.status === "success") {
-        load_products(res);
-        setUser(res.data.user[0]);
-      }
+      load_products(res);
+      setUser(res.data.user[0]);
     } else {
+      message.error("You should sign in again!");
       navigate("/login");
-      message.error("You should be logged in!");
     }
   };
 
@@ -187,6 +171,6 @@ const homepage = observer(() => {
       </ConfigProvider>
     </Layout>
   );
-});
+};
 
-export default homepage;
+export default HomePage;

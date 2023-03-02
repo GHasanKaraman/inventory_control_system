@@ -1,32 +1,21 @@
 import React from "react";
 import { useState, useEffect } from "react";
-import { observer } from "mobx-react";
 import { useNavigate } from "react-router-dom";
 import { Row, Col } from "antd";
+import userAuth from "../../utils/userAuth.js";
 
 import baseRequest from "../../core/baseRequest.js";
 import logo from "../../images/logo.png";
 import "../../App.css";
-import { useStore } from "../../stores/useStore";
 
-import {
-  message,
-  Form,
-  Input,
-  Button,
-  Modal,
-  Checkbox,
-  Avatar,
-  Image,
-} from "antd";
+import { message, Form, Input, Button, Modal, Checkbox, Avatar } from "antd";
 
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-
+  
 var md5 = require("md5");
 
-const loginPage = observer((props) => {
+const LoginPage = (props) => {
   const navigate = useNavigate();
-  const { userStore } = useStore();
 
   const [user, setUser] = useState(localStorage.getItem("username") || "");
   const [checked, setChecked] = useState(
@@ -42,7 +31,7 @@ const loginPage = observer((props) => {
   const [form] = Form.useForm();
 
   useEffect(() => {
-    const status = userStore.control();
+    const status = userAuth.control();
     if (status) {
       navigate("/home");
     }
@@ -78,7 +67,7 @@ const loginPage = observer((props) => {
       localStorage.removeItem("remember");
     }
 
-    const res = await userStore.login(values.email, values.password);
+    const res = await userAuth.login(values.email, values.password);
     if (res.result === "success") {
       navigate("/home");
     } else if (res.result === "not_found") {
@@ -130,14 +119,22 @@ const loginPage = observer((props) => {
   return (
     <div>
       <Row align="center">
-        <Col xs={{ span: 20, offset: 2 }} xl={{ span: 8, offset: 4 }} lg={{span:8, offset:4}} md={{span:10}}>
+        <Col
+          xs={{ span: 20, offset: 2 }}
+          xl={{ span: 8, offset: 4 }}
+          lg={{ span: 8, offset: 4 }}
+          md={{ span: 10 }}
+        >
           <Form
             name="normal_login"
             className="login-form"
             initialValues={{ email: user, remember: checked }}
             onFinish={login}
           >
-            <Avatar size={{ xs: 300, sm:300,md:300,lg:300, xl: 300, xxl: 300 }} src={logo} />
+            <Avatar
+              size={{ xs: 300, sm: 300, md: 300, lg: 300, xl: 300, xxl: 300 }}
+              src={logo}
+            />
             <Form.Item
               name="email"
               rules={[
@@ -295,6 +292,6 @@ const loginPage = observer((props) => {
       </Row>
     </div>
   );
-});
+};
 
-export default loginPage;
+export default LoginPage;
