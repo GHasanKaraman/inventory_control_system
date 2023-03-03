@@ -1,8 +1,8 @@
-import { Modal, Table, Tabs, Result } from "antd";
+import { Table, Tabs, Result } from "antd";
 import { useEffect, useState } from "react";
 import { get_technicianLogs, get_qrLogs } from "./logsController";
 
-const LogModal = (props) => {
+const LogsPage = (props) => {
   const [technicianLogs, setTechnicianLogs] = useState([
     { desc: "", createdAt: "" },
   ]);
@@ -71,17 +71,7 @@ const LogModal = (props) => {
     },
   ];
 
-  return (
-    <Modal
-      open={props.open}
-      title="Technician Logs"
-      onCancel={props.onCancel}
-      footer={null}
-      width={1000}
-    >
-      <Tabs defaultActiveKey="1" items={items} onChange={onTabChange} />
-    </Modal>
-  );
+  return <Tabs defaultActiveKey="1" items={items} onChange={onTabChange} />;
 };
 
-export default LogModal;
+export default LogsPage;

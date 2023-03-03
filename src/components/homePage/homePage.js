@@ -61,7 +61,7 @@ const HomePage = (props) => {
   }, []);
 
   useEffect(() => {
-    //This is for updating table always
+    //This is for reloading home page
     const interval = setInterval(() => {
       loadHomePage();
     }, 1000 * 60 * 20);

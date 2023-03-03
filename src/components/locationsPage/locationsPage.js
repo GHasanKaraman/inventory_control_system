@@ -24,12 +24,12 @@ import {
   saveRack,
 } from "./locationController";
 
-import { EditableCell, EditableRow } from "../../components/tableUtils";
+import { EditableCell, EditableRow } from "../tableUtils";
 import PrintComponent from "../../utils/print";
 
 const { Content } = Layout;
 
-const LocationModal = (props) => {
+const LocationsPage = (props) => {
   const [locations, setLocations] = useState();
   const [racks, setRacks] = useState();
 
@@ -302,21 +302,7 @@ const LocationModal = (props) => {
     },
   ];
 
-  return (
-    <Modal
-      width={"26%"}
-      onCancel={() => {
-        props.onCancel();
-        rackForm.resetFields();
-        locationForm.resetFields();
-      }}
-      footer={null}
-      open={props.open}
-      title="Locations"
-    >
-      <Tabs defaultActiveKey="1" items={items} onChange={onTabChange} />
-    </Modal>
-  );
+  return <Tabs defaultActiveKey="1" items={items} onChange={onTabChange} />;
 };
 
-export default LocationModal;
+export default LocationsPage;

@@ -15,7 +15,7 @@ import {
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import PrintComponent from "../utils/print";
-import { get_racks } from "./locationModal/locationController";
+import { get_racks } from "./locationsPage/locationController";
 
 const { Option } = Select;
 

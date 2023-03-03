@@ -3,30 +3,17 @@ import { useNavigate } from "react-router-dom";
 
 import { get_products, logout } from "./modalsController";
 
-import LabelsModal from "../components/labelsModal/labels";
 import ItemsModal from "./itemsModal/items";
 import GiveModal from "./giveModal/give";
-import TechnicianModal from "../components/techniciansModal/technicians";
-import LogModal from "../components/logsModal/logs";
-import LocationModal from "../components/locationModal/location";
-import OrdersModal from "../components/ordersModal/orders";
 
 const ModalRouter = (props) => {
   const navigate = useNavigate();
 
-  const [logModal, setLogModal] = useState(false);
-  const [labelsModal, setLabelsModal] = useState(false);
   const [registerModal, setRegisterModal] = useState(false);
   const [updateModal, setUpdateModal] = useState(false);
   const [giveModal, setGiveModal] = useState(false);
-  const [technicianModal, setTechnicianModal] = useState(false);
-  const [locationModal, setLocationModal] = useState(false);
-  const [orderModal, setOrderModal] = useState(false);
 
   const hideModal = async () => {
-    if (labelsModal) {
-      setLabelsModal(false);
-    }
     if (registerModal) {
       setRegisterModal(false);
     }
@@ -35,18 +22,6 @@ const ModalRouter = (props) => {
     }
     if (giveModal) {
       setGiveModal(false);
-    }
-    if (technicianModal) {
-      setTechnicianModal(false);
-    }
-    if (logModal) {
-      setLogModal(false);
-    }
-    if (locationModal) {
-      setLocationModal(false);
-    }
-    if (orderModal) {
-      setOrderModal(false);
     }
 
     const data = await get_products();
@@ -61,19 +36,19 @@ const ModalRouter = (props) => {
             setRegisterModal(true);
             break;
           case 2:
-            setLabelsModal(true);
+            navigate("/labels");
             break;
           case 3:
-            setTechnicianModal(true);
+            navigate("/technicians");
             break;
           case 4:
-            setLogModal(true);
+            navigate("/logs");
             break;
           case 5:
-            setLocationModal(true);
+            navigate("/locations");
             break;
           case 6:
-            setOrderModal(true);
+            navigate("/orders");
             break;
           case 7:
             logout();
@@ -108,11 +83,6 @@ const ModalRouter = (props) => {
       title="Register New Item"
       buttonText="Add Item"
     />,
-    <LabelsModal open={labelsModal} onCancel={hideModal} />,
-    <TechnicianModal open={technicianModal} onCancel={hideModal} />,
-    <LogModal open={logModal} onCancel={hideModal} />,
-    <LocationModal open={locationModal} onCancel={hideModal} />,
-    <OrdersModal open={orderModal} onCancel={hideModal} />,
   ];
 
   const otherModals = [

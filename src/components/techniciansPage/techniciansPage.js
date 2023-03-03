@@ -18,11 +18,11 @@ import {
   handleSave,
 } from "./techniciansController";
 
-import { EditableCell, EditableRow } from "../../components/tableUtils";
+import { EditableCell, EditableRow } from "../tableUtils";
 
 const { Content } = Layout;
 
-const TechnicianModal = (props) => {
+const TechniciansPage = (props) => {
   const [data, setData] = useState();
 
   const load_technicians = async () => {
@@ -91,64 +91,53 @@ const TechnicianModal = (props) => {
   });
 
   return (
-    <Modal
-      width={"23%"}
-      onCancel={() => {
-        props.onCancel();
-        form.resetFields();
-      }}
-      footer={null}
-      open={props.open}
-      title="Technicians"
-    >
-      <Space direction="vertical" align="center" size="large">
-        <Row>
-          <Form
-            name="horizontal_login"
-            form={form}
-            layout="inline"
-            onFinish={async (values) => {
-              await addTechnician(values, form);
-              await load_technicians();
-            }}
+    <Space direction="vertical" align="center" size="large">
+      <Row>
+        <Form
+          name="horizontal_login"
+          form={form}
+          layout="inline"
+          onFinish={async (values) => {
+            await addTechnician(values, form);
+            await load_technicians();
+          }}
+        >
+          <Form.Item
+            name="name"
+            rules={[
+              { required: true, message: "Please input a technician name!" },
+            ]}
           >
-            <Form.Item
-              name="name"
-              rules={[
-                { required: true, message: "Please input a technician name!" },
-              ]}
-            >
-              <Input placeholder="Technician" />
-            </Form.Item>
+            <Input placeholder="Technician" />
+          </Form.Item>
 
-            <Form.Item shouldUpdate>
-              {() => (
-                <Button type="primary" htmlType="submit">
-                  Add Technician
-                </Button>
-              )}
-            </Form.Item>
-          </Form>
-        </Row>
-        <Row>
-          <Content
-            style={{
-              margin: "0px 12px 0",
-              overflow: "initial",
-            }}
-          >
-            <Table
-              components={components}
-              rowClassName={() => "editable-row"}
-              bordered
-              dataSource={data}
-              columns={columns}
-            />
-          </Content>
-        </Row>
-      </Space>
-    </Modal>
+          <Form.Item shouldUpdate>
+            {() => (
+              <Button type="primary" htmlType="submit">
+                Add Technician
+              </Button>
+            )}
+          </Form.Item>
+        </Form>
+      </Row>
+      <Row>
+        <Content
+          style={{
+            margin: "0px 12px 0",
+            overflow: "initial",
+          }}
+        >
+          <Table
+            components={components}
+            rowClassName={() => "editable-row"}
+            bordered
+            dataSource={data}
+            columns={columns}
+          />
+        </Content>
+      </Row>
+    </Space>
   );
 };
 
-export default TechnicianModal;
+export default TechniciansPage;

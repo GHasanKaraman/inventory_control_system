@@ -16,11 +16,7 @@ import {
 } from "antd";
 
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import {
-  get_labels,
-  get_locations,
-  tagRender,
-} from "../itemsModal/itemsController";
+import { get_labels, tagRender } from "../itemsModal/itemsController";
 import {
   addOrder,
   get_orders,
@@ -29,7 +25,7 @@ import {
 } from "./ordersController";
 import OrderDetailsModal from "../orderDetailsModal/orderDetails";
 
-const OrdersModal = (props) => {
+const OrdersPage = (props) => {
   const [options, setOptions] = useState([{ value: "gold" }]);
   const [orders, setOrders] = useState([{ title: "N/A" }]);
 
@@ -375,12 +371,7 @@ const OrdersModal = (props) => {
     },
   ];
   return (
-    <Modal
-      open={props.open}
-      onCancel={props.onCancel}
-      footer={null}
-      width="35%"
-    >
+    <div>
       <Tabs
         items={tabs}
         onTabClick={(e) => {
@@ -397,7 +388,7 @@ const OrdersModal = (props) => {
           setDetailsModal(false);
         }}
       />
-    </Modal>
+    </div>
   );
 };
-export default OrdersModal;
+export default OrdersPage;
