@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
-import { get_products, logout } from "./modalsController";
+import { get_products } from "./modalsController";
 
 import ItemsModal from "./itemsModal/items";
 import GiveModal from "./giveModal/give";
 
 const ModalRouter = (props) => {
-  const navigate = useNavigate();
-
   const [registerModal, setRegisterModal] = useState(false);
   const [updateModal, setUpdateModal] = useState(false);
   const [giveModal, setGiveModal] = useState(false);
@@ -28,62 +25,25 @@ const ModalRouter = (props) => {
     props.refreshTable(data);
   };
 
+  const selector = (key) => {
+    switch (key) {
+      case 1:
+        setUpdateModal(true);
+        break;
+      case 2:
+        setGiveModal(true);
+        break;
+      default:
+        console.log("Other");
+        break;
+    }
+  };
+
   useEffect(() => {
     if (props.selectedIndex) {
-      if (props.selectedIndex.key) {
-        switch (props.selectedIndex.key) {
-          case 1:
-            setRegisterModal(true);
-            break;
-          case 2:
-            navigate("/labels");
-            break;
-          case 3:
-            navigate("/technicians");
-            break;
-          case 4:
-            navigate("/logs");
-            break;
-          case 5:
-            navigate("/locations");
-            break;
-          case 6:
-            navigate("/orders");
-            break;
-          case 7:
-            logout();
-            navigate("/login");
-          default:
-            console.log("Menu");
-            break;
-        }
-      } else {
-        switch (props.selectedIndex.otherKey) {
-          case 1:
-            setUpdateModal(true);
-            break;
-          case 2:
-            setGiveModal(true);
-            break;
-          default:
-            console.log("Other");
-            break;
-        }
-      }
+      selector(props.selectedIndex.key);
     }
   }, [props.selectedIndex]);
-
-  const menuModals = [
-    <div />,
-    <ItemsModal
-      refresh={props.refresh}
-      type="add"
-      open={registerModal}
-      onCancel={hideModal}
-      title="Register New Item"
-      buttonText="Add Item"
-    />,
-  ];
 
   const otherModals = [
     <div />,
@@ -104,9 +64,7 @@ const ModalRouter = (props) => {
 
   if (props.selectedIndex) {
     if (props.selectedIndex.key) {
-      return menuModals[props.selectedIndex.key];
-    } else if (props.selectedIndex.otherKey) {
-      return otherModals[props.selectedIndex.otherKey];
+      return otherModals[props.selectedIndex.key];
     }
   }
 

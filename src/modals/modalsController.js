@@ -31,9 +31,4 @@ const convert_images = async (records, start, end) => {
   return dataSource;
 };
 
-const logout = () => {
-  localStorage.removeItem("token");
-  message.success("You have successfully logged out!");
-};
-
-export { get_products, logout };
+export { get_products };

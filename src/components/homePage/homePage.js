@@ -21,6 +21,7 @@ import { ProductTable } from "../tableUtils";
 import { get_products, handleDelete, get_colors } from "./homeController";
 import { openNotifications } from "./notifications";
 import userAuth from "../../utils/userAuth.js";
+import MenuSelector from "../../utils/menuSelector";
 
 const { Sider, Content } = Layout;
 
@@ -47,7 +48,8 @@ const items = [
 }));
 
 const HomePage = (props) => {
-  const [selectedModal, setSelectedModal] = useState();
+  const [modalIndex, setmodalIndex] = useState();
+  const [pageIndex, setPageIndex] = useState(0);
   const [user, setUser] = useState();
   const [data, setData] = useState();
   const [colorData, setColorData] = useState();
@@ -92,8 +94,8 @@ const HomePage = (props) => {
   };
 
   const handleGive = (record) => {
-    setSelectedModal({
-      otherKey: 2,
+    setmodalIndex({
+      key: 2,
       product: {
         parts: record.parts,
         count: record.count,
@@ -124,13 +126,15 @@ const HomePage = (props) => {
               theme="dark"
               mode="inline"
               items={items}
-              onClick={(item) => setSelectedModal({ key: Number(item.key) })}
+              onClick={(item) => {
+                setPageIndex({ key: item.key });
+              }}
             />
             <ModalRouter
-              selectedIndex={selectedModal}
+              selectedIndex={modalIndex}
               refreshTable={refreshTable}
-              refresh={load_products}
             />
+            <MenuSelector selectedIndex={pageIndex} />
           </Sider>
 
           <Layout style={{ padding: "0 24px 24px", width: "400%" }}>
@@ -168,7 +172,7 @@ const HomePage = (props) => {
                           image: record.image,
                         };
 
-                        setSelectedModal({ otherKey: 1, product: product });
+                        setmodalIndex({ key: 1, product: product });
                       },
                     };
                   }}

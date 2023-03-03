@@ -49,10 +49,8 @@ const LabelsPage = (props) => {
   };
 
   useEffect(() => {
-    if (props.open) {
-      load_labels();
-    }
-  }, [props.open]);
+    load_labels();
+  }, []);
 
   const defaultColumns = [
     {
@@ -119,10 +117,6 @@ const LabelsPage = (props) => {
     <Space direction="vertical" align="center" size="large">
       <Row justify={"start"}>
         <Form
-          wrapperCol={{
-            xxl: { span: 15, offset: 8 },
-            xs: { span: 24, offset: 0 },
-          }}
           name="horizontal_login"
           form={form}
           layout="inline"
@@ -132,10 +126,6 @@ const LabelsPage = (props) => {
           }}
         >
           <Form.Item
-            wrapperCol={{
-              xxl: { span: 22, offset: 2 },
-              xs: { span: 18, offset: 6 },
-            }}
             name="label"
             rules={[
               { required: true, message: "Please input a new label name!" },
@@ -144,10 +134,6 @@ const LabelsPage = (props) => {
             <Input placeholder="Label" />
           </Form.Item>
           <Form.Item
-            wrapperCol={{
-              xxl: { span: 18, offset: 1 },
-              xs: { span: 0, offset: 5 },
-            }}
             name="color"
             rules={[{ required: true, message: "Please pick a color!" }]}
           >
@@ -174,13 +160,7 @@ const LabelsPage = (props) => {
               })}
             </Select>
           </Form.Item>
-          <Form.Item
-            shouldUpdate
-            wrapperCol={{
-              xxl: { span: 19, offset: 5 },
-              xs: { span: 2, offset: 24 },
-            }}
-          >
+          <Form.Item shouldUpdate>
             {() => (
               <Button type="primary" htmlType="submit">
                 Add Label

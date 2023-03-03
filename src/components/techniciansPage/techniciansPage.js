@@ -3,12 +3,14 @@ import {
   Form,
   Input,
   Button,
-  Modal,
+  ConfigProvider,
+  Layout,
+  Menu,
+  Typography,
   Row,
   Table,
   Popconfirm,
   Space,
-  Layout,
 } from "antd";
 
 import {
@@ -20,7 +22,7 @@ import {
 
 import { EditableCell, EditableRow } from "../tableUtils";
 
-const { Content } = Layout;
+const { Sider, Content } = Layout;
 
 const TechniciansPage = (props) => {
   const [data, setData] = useState();
@@ -91,52 +93,97 @@ const TechniciansPage = (props) => {
   });
 
   return (
-    <Space direction="vertical" align="center" size="large">
-      <Row>
-        <Form
-          name="horizontal_login"
-          form={form}
-          layout="inline"
-          onFinish={async (values) => {
-            await addTechnician(values, form);
-            await load_technicians();
-          }}
-        >
-          <Form.Item
-            name="name"
-            rules={[
-              { required: true, message: "Please input a technician name!" },
-            ]}
-          >
-            <Input placeholder="Technician" />
-          </Form.Item>
+    <div /> /*
+    <Layout style={{ width: "100%" }}>
+      <ConfigProvider
+        theme={{
+          token: {
+            fontSize: 15,
+            colorPrimary: "#227C70",
+          },
+        }}
+      >
+        <Layout style={{ height: "100%" }}>
+          <Sider>
+            <Menu
+              theme="dark"
+              mode="inline"
+              items={items}
+              onClick={(item) => setSelectedModal({ key: Number(item.key) })}
+            />
+            <ModalRouter
+              selectedIndex={selectedModal}
+              refreshTable={refreshTable}
+              refresh={load_products}
+            />
+          </Sider>
 
-          <Form.Item shouldUpdate>
-            {() => (
-              <Button type="primary" htmlType="submit">
-                Add Technician
-              </Button>
-            )}
-          </Form.Item>
-        </Form>
-      </Row>
-      <Row>
-        <Content
-          style={{
-            margin: "0px 12px 0",
-            overflow: "initial",
-          }}
-        >
-          <Table
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
-            dataSource={data}
-            columns={columns}
-          />
-        </Content>
-      </Row>
-    </Space>
+          <Layout style={{ padding: "0 24px 24px", width: "400%" }}>
+            <Content>
+              <div
+                style={{
+                  padding: 24,
+                  textAlign: "center",
+                }}
+              >
+                <Typography.Title style={{ color: "#227C70" }} level={4}>
+                  {user ? user.name.split(" ")[0] : ""}
+                </Typography.Title>
+              </div>
+              <Space direction="vertical" align="center" size="large">
+                <Row>
+                  <Form
+                    name="horizontal_login"
+                    form={form}
+                    layout="inline"
+                    onFinish={async (values) => {
+                      await addTechnician(values, form);
+                      await load_technicians();
+                    }}
+                  >
+                    <Form.Item
+                      name="name"
+                      rules={[
+                        {
+                          required: true,
+                          message: "Please input a technician name!",
+                        },
+                      ]}
+                    >
+                      <Input placeholder="Technician" />
+                    </Form.Item>
+
+                    <Form.Item shouldUpdate>
+                      {() => (
+                        <Button type="primary" htmlType="submit">
+                          Add Technician
+                        </Button>
+                      )}
+                    </Form.Item>
+                  </Form>
+                </Row>
+                <Row>
+                  <Content
+                    style={{
+                      margin: "0px 12px 0",
+                      overflow: "initial",
+                    }}
+                  >
+                    <Table
+                      components={components}
+                      rowClassName={() => "editable-row"}
+                      bordered
+                      dataSource={data}
+                      columns={columns}
+                    />
+                  </Content>
+                </Row>
+              </Space>
+            </Content>
+          </Layout>
+        </Layout>
+      </ConfigProvider>
+    </Layout>*/
   );
 };
 
