@@ -17,7 +17,7 @@ import {
 
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
-import { tagRender } from "../../modals/itemsModal/itemsController";
+import { tagRender } from "../itemsModal/itemsController";
 
 import { get_datas, addItem } from "./rackController";
 

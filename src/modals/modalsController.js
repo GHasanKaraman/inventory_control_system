@@ -17,6 +17,14 @@ const get_products = async (response) => {
   for (let i = 0; i < Object.keys(records).length; i++) {
     records[i].price = "$" + records[i].price.replace(".", ",");
     records[i].total_price = "$" + records[i].total_price.replace(".", ",");
+    dataSource.push(Object.values(records)[i]);
+  }
+  return dataSource;
+};
+
+const convert_images = async (records, start, end) => {
+  const dataSource = [];
+  for (let i = start; i <= end; i++) {
     records[i].image = await fetchImage(records[i].image);
     dataSource.push(Object.values(records)[i]);
   }

@@ -15,7 +15,7 @@ import {
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import PrintComponent from "../utils/print";
-import { get_racks } from "../modals/locationModal/locationController";
+import { get_racks } from "./locationModal/locationController";
 
 const { Option } = Select;
 
@@ -347,6 +347,7 @@ const ProductTable = (props) => {
       columns={columns}
       dataSource={props.dataSource}
       onRow={props.onRow}
+      onChange={props.onChange}
     />
   );
 };

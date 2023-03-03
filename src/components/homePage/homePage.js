@@ -60,6 +60,15 @@ const HomePage = (props) => {
     openNotifications();
   }, []);
 
+  useEffect(() => {
+    //This is for updating table always
+    const interval = setInterval(() => {
+      loadHomePage();
+    }, 1000 * 60 * 20);
+
+    return () => clearInterval(interval);
+  }, []);
+
   const load_products = async (res) => {
     const products = await get_products(res);
     setData(products);
@@ -162,6 +171,12 @@ const HomePage = (props) => {
                         setSelectedModal({ otherKey: 1, product: product });
                       },
                     };
+                  }}
+                  onChange={(e) => {
+                    const current = e.current;
+                    const pageSize = e.pageSize;
+                    const start = pageSize * (current - 1);
+                    const end = start + pageSize;
                   }}
                 />
               ) : null}

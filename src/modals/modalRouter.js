@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 
 import { get_products, logout } from "./modalsController";
 
-import LabelsModal from "./labelsModal/labels";
+import LabelsModal from "../components/labelsModal/labels";
 import ItemsModal from "./itemsModal/items";
 import GiveModal from "./giveModal/give";
-import TechnicianModal from "./techniciansModal/technicians";
-import LogModal from "./logsModal/logs";
-import LocationModal from "./locationModal/location";
-import OrdersModal from "./ordersModal/orders";
+import TechnicianModal from "../components/techniciansModal/technicians";
+import LogModal from "../components/logsModal/logs";
+import LocationModal from "../components/locationModal/location";
+import OrdersModal from "../components/ordersModal/orders";
 
 const ModalRouter = (props) => {
   const navigate = useNavigate();
