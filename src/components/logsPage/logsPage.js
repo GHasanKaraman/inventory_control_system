@@ -1,12 +1,19 @@
-import { Table, Tabs, Result } from "antd";
+import { Table, Tabs, Result, Layout, Row, ConfigProvider, Menu } from "antd";
 import { useEffect, useState } from "react";
 import { get_technicianLogs, get_qrLogs } from "./logsController";
+
+import MenuSelector from "../../utils/menuSelector";
+import * as menu from "../menu";
+
+const { Content, Sider } = Layout;
 
 const LogsPage = (props) => {
   const [technicianLogs, setTechnicianLogs] = useState([
     { desc: "", createdAt: "" },
   ]);
   const [qrLogs, setQRLogs] = useState([{ desc: "", createdAt: "" }]);
+
+  const [pageIndex, setPageIndex] = useState(0);
 
   const load_technicianLogs = async () => {
     const logs = await get_technicianLogs();
@@ -19,11 +26,9 @@ const LogsPage = (props) => {
   };
 
   useEffect(() => {
-    if (props.open) {
-      load_technicianLogs();
-      load_qrLogs();
-    }
-  }, [props.open]);
+    load_technicianLogs();
+    load_qrLogs();
+  }, []);
 
   const defaultColumns = [
     {
@@ -45,18 +50,22 @@ const LogsPage = (props) => {
       key: "1",
       label: `User Activity Logs`,
       children: (
-        <Table
-          columns={defaultColumns}
-          bordered
-          dataSource={technicianLogs}
-        ></Table>
+        <Row justify={"center"}>
+          <Table
+            columns={defaultColumns}
+            bordered
+            dataSource={technicianLogs}
+          />
+        </Row>
       ),
     },
     {
       key: "2",
       label: `QR Logs`,
       children: (
-        <Table columns={defaultColumns} bordered dataSource={qrLogs}></Table>
+        <Row justify={"center"}>
+          <Table columns={defaultColumns} bordered dataSource={qrLogs} />
+        </Row>
       ),
     },
     {
@@ -70,8 +79,50 @@ const LogsPage = (props) => {
       ),
     },
   ];
+  return (
+    <Layout style={{ width: "100%" }}>
+      <ConfigProvider
+        theme={{
+          token: {
+            fontSize: 15,
+            colorPrimary: "#227C70",
+          },
+        }}
+      >
+        <Layout style={{ height: "100%" }}>
+          <Sider>
+            <Menu defaultSelectedKeys={"5"}
+              theme="dark"
+              mode="inline"
+              items={menu.items}
+              onClick={(item) => {
+                setPageIndex({ key: item.key });
+              }}
+            />
+            <MenuSelector selectedIndex={pageIndex} />
+          </Sider>
 
-  return <Tabs defaultActiveKey="1" items={items} onChange={onTabChange} />;
+          <Layout style={{ padding: "0 24px 24px", width: "100%" }}>
+            <Content>
+              <div
+                style={{
+                  padding: 24,
+                }}
+              ></div>
+              <Row justify={"center"}>
+                <Tabs
+                  centered={true}
+                  defaultActiveKey="1"
+                  items={items}
+                  onChange={onTabChange}
+                />
+              </Row>
+            </Content>
+          </Layout>
+        </Layout>
+      </ConfigProvider>
+    </Layout>
+  );
 };
 
 export default LogsPage;

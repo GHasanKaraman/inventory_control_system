@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import {
-  Modal,
+  ConfigProvider,
+  Menu,
   Tabs,
   Avatar,
   List,
@@ -13,10 +14,12 @@ import {
   Image,
   Popconfirm,
   message,
+  Row,
+  Layout,
 } from "antd";
 
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import { get_labels, tagRender } from "../itemsModal/itemsController";
+import { get_labels, tagRender } from "../itemsPage/itemsController";
 import {
   addOrder,
   get_orders,
@@ -24,10 +27,16 @@ import {
   delete_order,
 } from "./ordersController";
 import OrderDetailsModal from "../orderDetailsModal/orderDetails";
+import MenuSelector from "../../utils/menuSelector";
+import * as menu from "../menu";
+
+const { Content, Sider } = Layout;
 
 const OrdersPage = (props) => {
   const [options, setOptions] = useState([{ value: "gold" }]);
   const [orders, setOrders] = useState([{ title: "N/A" }]);
+
+  const [pageIndex, setPageIndex] = useState(0);
 
   const [detailsModal, setDetailsModal] = useState(false);
   const [selectedItem, setSelectedItem] = useState({});
@@ -49,11 +58,9 @@ const OrdersPage = (props) => {
   };
 
   useEffect(() => {
-    if (props.open) {
-      load_orders();
-      load_items();
-    }
-  }, [props.open]);
+    load_orders();
+    load_items();
+  }, []);
 
   const handleChange = (info) => {
     if (info.file.status === "uploading") {
@@ -129,7 +136,6 @@ const OrdersPage = (props) => {
             }
           }}
           form={form}
-          style={{ marginTop: 30 }}
         >
           <Form.Item
             name="file"
@@ -372,14 +378,53 @@ const OrdersPage = (props) => {
   ];
   return (
     <div>
-      <Tabs
-        items={tabs}
-        onTabClick={(e) => {
-          if (e == 2) {
-            load_orders();
-          }
-        }}
-      ></Tabs>
+      <Layout style={{ width: "100%" }}>
+        <ConfigProvider
+          theme={{
+            token: {
+              fontSize: 15,
+              colorPrimary: "#227C70",
+            },
+          }}
+        >
+          <Layout style={{ height: "100%" }}>
+            <Sider>
+              <Menu
+                defaultSelectedKeys={"7"}
+                theme="dark"
+                mode="inline"
+                items={menu.items}
+                onClick={(item) => {
+                  setPageIndex({ key: item.key });
+                }}
+              />
+              <MenuSelector selectedIndex={pageIndex} />
+            </Sider>
+
+            <Layout style={{ padding: "0 24px 24px", width: "100%" }}>
+              <Content>
+                <div
+                  style={{
+                    padding: 24,
+                  }}
+                ></div>
+                <Row justify={"center"}>
+                  <Tabs
+                    centered={true}
+                    items={tabs}
+                    onTabClick={(e) => {
+                      if (e == 2) {
+                        load_orders();
+                      }
+                    }}
+                  ></Tabs>
+                </Row>
+              </Content>
+            </Layout>
+          </Layout>
+        </ConfigProvider>
+      </Layout>
+
       <OrderDetailsModal
         item={selectedItem}
         reload={load_orders}

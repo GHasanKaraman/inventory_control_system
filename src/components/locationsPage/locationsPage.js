@@ -3,7 +3,8 @@ import {
   Form,
   Input,
   Button,
-  Modal,
+  ConfigProvider,
+  Menu,
   Row,
   Table,
   Popconfirm,
@@ -25,13 +26,17 @@ import {
 } from "./locationController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
+import MenuSelector from "../../utils/menuSelector";
+import * as menu from "../menu";
 import PrintComponent from "../../utils/print";
 
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 
 const LocationsPage = (props) => {
   const [locations, setLocations] = useState();
   const [racks, setRacks] = useState();
+
+  const [pageIndex, setPageIndex] = useState(0);
 
   const load_locations = async () => {
     const locations = await get_locations();
@@ -44,11 +49,9 @@ const LocationsPage = (props) => {
   };
 
   useEffect(() => {
-    if (props.open) {
-      load_locations();
-      load_racks();
-    }
-  }, [props.open]);
+    load_locations();
+    load_racks();
+  }, []);
 
   const [rackForm] = Form.useForm();
   const [locationForm] = Form.useForm();
@@ -184,7 +187,6 @@ const LocationsPage = (props) => {
             <Form
               name="horizontal_login"
               form={locationForm}
-              layout="inline"
               onFinish={async (values) => {
                 await addLocation(values, locationForm);
                 await load_locations();
@@ -196,7 +198,12 @@ const LocationsPage = (props) => {
                   { required: true, message: "Please input a location name!" },
                 ]}
               >
-                <Input placeholder="Location" />
+                <Input
+                  placeholder="Location"
+                  style={{
+                    width: "200px",
+                  }}
+                />
               </Form.Item>
               <Form.Item
                 name="rack"
@@ -209,6 +216,9 @@ const LocationsPage = (props) => {
                 ]}
               >
                 <Select
+                  style={{
+                    width: "200px",
+                  }}
                   placeholder="Rack"
                   options={
                     racks
@@ -222,7 +232,13 @@ const LocationsPage = (props) => {
 
               <Form.Item shouldUpdate>
                 {() => (
-                  <Button type="primary" htmlType="submit">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    style={{
+                      width: "200px",
+                    }}
+                  >
                     Add Location
                   </Button>
                 )}
@@ -257,7 +273,6 @@ const LocationsPage = (props) => {
             <Form
               name="horizontal_login"
               form={rackForm}
-              layout="inline"
               onFinish={async (values) => {
                 await addRack(values, rackForm);
                 await load_racks();
@@ -269,12 +284,23 @@ const LocationsPage = (props) => {
                   { required: true, message: "Please input a rack name!" },
                 ]}
               >
-                <Input placeholder="Rack" />
+                <Input
+                  placeholder="Rack"
+                  style={{
+                    width: "200px",
+                  }}
+                />
               </Form.Item>
 
               <Form.Item shouldUpdate>
                 {() => (
-                  <Button type="primary" htmlType="submit">
+                  <Button
+                    type="primary"
+                    htmlType="submit"
+                    style={{
+                      width: "200px",
+                    }}
+                  >
                     Add Rack
                   </Button>
                 )}
@@ -301,8 +327,51 @@ const LocationsPage = (props) => {
       ),
     },
   ];
+  return (
+    <Layout style={{ width: "100%" }}>
+      <ConfigProvider
+        theme={{
+          token: {
+            fontSize: 15,
+            colorPrimary: "#227C70",
+          },
+        }}
+      >
+        <Layout style={{ height: "100%" }}>
+          <Sider>
+            <Menu
+              defaultSelectedKeys={"6"}
+              theme="dark"
+              mode="inline"
+              items={menu.items}
+              onClick={(item) => {
+                setPageIndex({ key: item.key });
+              }}
+            />
+            <MenuSelector selectedIndex={pageIndex} />
+          </Sider>
 
-  return <Tabs defaultActiveKey="1" items={items} onChange={onTabChange} />;
+          <Layout style={{ padding: "0 24px 24px", width: "100%" }}>
+            <Content>
+              <div
+                style={{
+                  padding: 24,
+                }}
+              ></div>
+              <Row justify={"center"}>
+                <Tabs
+                  defaultActiveKey="1"
+                  centered={true}
+                  items={items}
+                  onChange={onTabChange}
+                />
+              </Row>
+            </Content>
+          </Layout>
+        </Layout>
+      </ConfigProvider>
+    </Layout>
+  );
 };
 
 export default LocationsPage;

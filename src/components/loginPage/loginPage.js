@@ -11,7 +11,7 @@ import "../../App.css";
 import { message, Form, Input, Button, Modal, Checkbox, Avatar } from "antd";
 
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
-  
+
 var md5 = require("md5");
 
 const LoginPage = (props) => {
@@ -118,6 +118,7 @@ const LoginPage = (props) => {
 
   return (
     <div>
+      <h5>v1.0</h5>
       <Row align="center">
         <Col
           xs={{ span: 20, offset: 2 }}
@@ -135,6 +136,7 @@ const LoginPage = (props) => {
               size={{ xs: 300, sm: 300, md: 300, lg: 300, xl: 300, xxl: 300 }}
               src={logo}
             />
+
             <Form.Item
               name="email"
               rules={[

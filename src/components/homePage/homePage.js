@@ -3,15 +3,6 @@ import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { ConfigProvider, Layout, Menu, message, Typography } from "antd";
-import {
-  UploadOutlined,
-  TagsOutlined,
-  LogoutOutlined,
-  ToolFilled,
-  BookFilled,
-  DatabaseOutlined,
-  CarOutlined,
-} from "@ant-design/icons";
 
 import baseRequest from "../../core/baseRequest";
 
@@ -22,30 +13,9 @@ import { get_products, handleDelete, get_colors } from "./homeController";
 import { openNotifications } from "./notifications";
 import userAuth from "../../utils/userAuth.js";
 import MenuSelector from "../../utils/menuSelector";
+import * as menu from "../menu";
 
 const { Sider, Content } = Layout;
-
-const items = [
-  UploadOutlined,
-  TagsOutlined,
-  ToolFilled,
-  BookFilled,
-  DatabaseOutlined,
-  CarOutlined,
-  LogoutOutlined,
-].map((icon, index) => ({
-  key: index + 1,
-  icon: React.createElement(icon),
-  label: [
-    "Add New Item",
-    "Labels",
-    "Technicians",
-    "Logs",
-    "Locations",
-    "Orders",
-    "Log Out",
-  ][index],
-}));
 
 const HomePage = (props) => {
   const [modalIndex, setmodalIndex] = useState();
@@ -123,9 +93,10 @@ const HomePage = (props) => {
         <Layout style={{ height: "100%" }}>
           <Sider>
             <Menu
+              defaultSelectedKeys={"1"}
               theme="dark"
               mode="inline"
-              items={items}
+              items={menu.items}
               onClick={(item) => {
                 setPageIndex({ key: item.key });
               }}

@@ -8,8 +8,9 @@ import {
   Select,
   Table,
   Popconfirm,
-  Space,
   Layout,
+  ConfigProvider,
+  Menu,
 } from "antd";
 
 import {
@@ -20,9 +21,11 @@ import {
 } from "./labelsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
+import MenuSelector from "../../utils/menuSelector";
+import * as menu from "../menu";
 
 const { Option } = Select;
-const { Content } = Layout;
+const { Content, Sider } = Layout;
 
 const colors = [
   "magenta",
@@ -37,10 +40,14 @@ const colors = [
   "geekblue",
   "purple",
   "black",
+  "pink",
+  "brown",
+  "violet",
 ];
 
 const LabelsPage = (props) => {
   const [data, setData] = useState();
+  const [pageIndex, setPageIndex] = useState(0);
   const [form] = Form.useForm();
 
   const load_labels = async () => {
@@ -114,73 +121,124 @@ const LabelsPage = (props) => {
   });
 
   return (
-    <Space direction="vertical" align="center" size="large">
-      <Row justify={"start"}>
-        <Form
-          name="horizontal_login"
-          form={form}
-          layout="inline"
-          onFinish={async (values) => {
-            await addLabel(values, form);
-            await load_labels();
-          }}
-        >
-          <Form.Item
-            name="label"
-            rules={[
-              { required: true, message: "Please input a new label name!" },
-            ]}
-          >
-            <Input placeholder="Label" />
-          </Form.Item>
-          <Form.Item
-            name="color"
-            rules={[{ required: true, message: "Please pick a color!" }]}
-          >
-            <Select
-              placeholder="Color"
-              allowClear
-              style={{
-                textAlign: "center",
-                width: "130px",
+    <Layout style={{ width: "100%" }}>
+      <ConfigProvider
+        theme={{
+          token: {
+            fontSize: 15,
+            colorPrimary: "#227C70",
+          },
+        }}
+      >
+        <Layout style={{ height: "100%" }}>
+          <Sider>
+            <Menu
+              defaultSelectedKeys={"3"}
+              theme="dark"
+              mode="inline"
+              items={menu.items}
+              onClick={(item) => {
+                setPageIndex({ key: item.key });
               }}
-            >
-              {colors.map((color) => {
-                return (
-                  <Option
-                    key={color}
-                    value={color}
-                    style={{ textAlign: "center" }}
+            />
+            <MenuSelector selectedIndex={pageIndex} />
+          </Sider>
+
+          <Layout style={{ padding: "0 24px 24px", width: "100%" }}>
+            <Content>
+              <div
+                style={{
+                  padding: 24,
+                }}
+              ></div>
+              <Row justify={"center"}>
+                <Form
+                  name="horizontal_login"
+                  form={form}
+                  onFinish={async (values) => {
+                    await addLabel(values, form);
+                    await load_labels();
+                  }}
+                >
+                  <Form.Item
+                    name="label"
+                    rules={[
+                      {
+                        required: true,
+                        message: "Please input a new label name!",
+                      },
+                    ]}
                   >
-                    <Tag color={color} style={{ width: 75 }}>
-                      <p style={{ textAlign: "center", height: 8 }}>{color}</p>
-                    </Tag>
-                  </Option>
-                );
-              })}
-            </Select>
-          </Form.Item>
-          <Form.Item shouldUpdate>
-            {() => (
-              <Button type="primary" htmlType="submit">
-                Add Label
-              </Button>
-            )}
-          </Form.Item>
-        </Form>
-      </Row>
-      <Row>
-        <Content>
-          <Table
-            components={components}
-            rowClassName={() => "editable-row"}
-            bordered
-            dataSource={data}
-            columns={columns}
-          />
-        </Content>
-      </Row>
-    </Space>
+                    <Input
+                      placeholder="Label"
+                      style={{
+                        width: "200px",
+                      }}
+                    />
+                  </Form.Item>
+                  <Form.Item
+                    name="color"
+                    rules={[
+                      { required: true, message: "Please pick a color!" },
+                    ]}
+                  >
+                    <Select
+                      placeholder="Color"
+                      allowClear
+                      style={{
+                        textAlign: "center",
+                        width: "200px",
+                      }}
+                    >
+                      {colors.map((color) => {
+                        return (
+                          <Option
+                            key={color}
+                            value={color}
+                            style={{ textAlign: "center" }}
+                          >
+                            <Tag
+                              color={color}
+                              style={{ width: 75, textAlign: "center" }}
+                            >
+                              <p style={{ height: 8 }}>{color}</p>
+                            </Tag>
+                          </Option>
+                        );
+                      })}
+                    </Select>
+                  </Form.Item>
+                  <Form.Item shouldUpdate>
+                    {() => (
+                      <Button
+                        type="primary"
+                        htmlType="submit"
+                        style={{
+                          width: "200px",
+                        }}
+                      >
+                        Add Label
+                      </Button>
+                    )}
+                  </Form.Item>
+                </Form>
+              </Row>
+              <Row justify={"center"}>
+                <Content>
+                  <Table
+                    components={components}
+                    rowClassName={() => "editable-row"}
+                    bordered
+                    dataSource={data}
+                    columns={columns}
+                  />
+                </Content>
+              </Row>
+            </Content>
+          </Layout>
+        </Layout>
+      </ConfigProvider>
+    </Layout>
   );
 };
 

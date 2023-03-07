@@ -10,6 +10,7 @@ import LocationsPage from "../components/locationsPage/locationsPage";
 import OrdersPage from "../components/ordersPage/ordersPage";
 import GivePage from "../components/givePage/givePage";
 import RackPage from "../components/rackPage/rackPage";
+import ItemsPage from "../components/itemsPage/itemsPage";
 
 const Pages = () => {
   return (
@@ -18,6 +19,7 @@ const Pages = () => {
         <Route exact path="/" element={<LoginPage />} />
         <Route exact path="/login" element={<LoginPage />} />
         <Route exact path="/home" element={<HomePage />} />
+        <Route exact path="/additem" element={<ItemsPage />} />
         <Route exact path="/labels" element={<LabelsPage />} />
         <Route exact path="/technicians" element={<TechniciansPage />} />
         <Route exact path="/logs" element={<LogsPage />} />

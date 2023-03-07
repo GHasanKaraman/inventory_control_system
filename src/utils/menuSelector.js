@@ -13,24 +13,27 @@ const MenuSelector = (props) => {
   const selector = (key) => {
     switch (parseInt(key)) {
       case 1:
-        navigate("/additem");
+        navigate("/home");
         break;
       case 2:
-        navigate("/labels");
+        navigate("/additem");
         break;
       case 3:
-        navigate("/technicians");
+        navigate("/labels");
         break;
       case 4:
-        navigate("/logs");
+        navigate("/technicians");
         break;
       case 5:
-        navigate("/locations");
+        navigate("/logs");
         break;
       case 6:
-        navigate("/orders");
+        navigate("/locations");
         break;
       case 7:
+        navigate("/orders");
+        break;
+      case 8:
         logout();
         navigate("/login");
         break;
