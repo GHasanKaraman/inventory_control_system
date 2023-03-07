@@ -1,4 +1,4 @@
-import baseRequest from "../../core/baseRequest";
+import baseRequest from "../core/baseRequest";
 import { message, Tag } from "antd";
 
 const addItem = async (values, form) => {

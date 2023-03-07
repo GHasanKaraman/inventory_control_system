@@ -1,5 +1,5 @@
 import { message } from "antd";
-import baseRequest from "../../core/baseRequest";
+import baseRequest from "../core/baseRequest";
 
 const get_technicianLogs = async () => {
   const res = await baseRequest.post("/logs/technicians", {});

@@ -18,7 +18,7 @@ import {
   addTechnician,
   handleDelete,
   handleSave,
-} from "./techniciansController";
+} from "../../controllers/techniciansController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";

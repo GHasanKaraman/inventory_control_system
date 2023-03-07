@@ -21,7 +21,7 @@ import {
   get_labels,
   tagRender,
   get_locations,
-} from "./itemsController";
+} from "../../controllers/itemsController";
 
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";

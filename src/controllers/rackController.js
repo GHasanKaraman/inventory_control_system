@@ -1,5 +1,5 @@
 import { message } from "antd";
-import baseRequest from "../../core/baseRequest";
+import baseRequest from "../core/baseRequest";
 
 const get_datas = async (id) => {
   const result = await baseRequest.post("/qr/rack", { _id: id });

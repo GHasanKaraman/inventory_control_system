@@ -1,6 +1,6 @@
 import { notification } from "antd";
-import { get_orders } from "../ordersPage/ordersController";
-import { get_products } from "./homeController";
+import { get_orders } from "../../controllers/ordersController";
+import { get_products } from "../../controllers/homeController";
 
 const openNotifications = async () => {
   const orders = await get_orders();

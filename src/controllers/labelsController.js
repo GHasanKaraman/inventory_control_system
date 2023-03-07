@@ -1,4 +1,4 @@
-import baseRequest from "../../core/baseRequest";
+import baseRequest from "../core/baseRequest";
 
 import { message } from "antd";
 

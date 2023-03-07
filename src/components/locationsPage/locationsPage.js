@@ -23,7 +23,7 @@ import {
   addRack,
   deleteRack,
   saveRack,
-} from "./locationController";
+} from "../../controllers/locationController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";

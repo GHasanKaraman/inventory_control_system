@@ -9,7 +9,11 @@ import baseRequest from "../../core/baseRequest";
 import ModalRouter from "../../modals/modalRouter";
 
 import { ProductTable } from "../tableUtils";
-import { get_products, handleDelete, get_colors } from "./homeController";
+import {
+  get_products,
+  handleDelete,
+  get_colors,
+} from "../../controllers/homeController";
 import { openNotifications } from "./notifications";
 import userAuth from "../../utils/userAuth.js";
 import MenuSelector from "../../utils/menuSelector";

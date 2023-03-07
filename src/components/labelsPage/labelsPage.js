@@ -18,7 +18,7 @@ import {
   addLabel,
   handleDelete,
   handleSave,
-} from "./labelsController";
+} from "../../controllers/labelsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";

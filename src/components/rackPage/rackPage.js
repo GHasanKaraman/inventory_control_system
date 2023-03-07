@@ -17,9 +17,9 @@ import {
 
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
-import { tagRender } from "../itemsPage/itemsController";
+import { tagRender } from "../../controllers/itemsController";
 
-import { get_datas, addItem } from "./rackController";
+import { get_datas, addItem } from "../../controllers/rackController";
 
 const RackPage = (props) => {
   const params = useParams();

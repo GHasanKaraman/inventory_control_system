@@ -19,13 +19,13 @@ import {
 } from "antd";
 
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import { get_labels, tagRender } from "../itemsPage/itemsController";
+import { get_labels, tagRender } from "../../controllers/itemsController";
 import {
   addOrder,
   get_orders,
   step_up,
   delete_order,
-} from "./ordersController";
+} from "../../controllers/ordersController";
 import OrderDetailsModal from "../orderDetailsModal/orderDetails";
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";

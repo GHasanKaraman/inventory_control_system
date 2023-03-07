@@ -1,7 +1,7 @@
 import { Modal, Form, Button, Select, Input, Typography } from "antd";
 import { useEffect, useState } from "react";
-import { get_locations } from "../itemsPage/itemsController";
-import { transferOrder } from "./orderDetailsController";
+import { get_locations } from "../../controllers/itemsController";
+import { transferOrder } from "../../controllers/orderDetailsController";
 
 const OrderDetailsModal = (props) => {
   const [form] = Form.useForm();

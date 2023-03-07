@@ -1,6 +1,6 @@
 import { Table, Tabs, Result, Layout, Row, ConfigProvider, Menu } from "antd";
 import { useEffect, useState } from "react";
-import { get_technicianLogs, get_qrLogs } from "./logsController";
+import { get_technicianLogs, get_qrLogs } from "../../controllers/logsController";
 
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
