@@ -147,12 +147,6 @@ const HomePage = (props) => {
                       },
                     };
                   }}
-                  onChange={(e) => {
-                    const current = e.current;
-                    const pageSize = e.pageSize;
-                    const start = pageSize * (current - 1);
-                    const end = start + pageSize;
-                  }}
                 />
               ) : null}
             </Content>

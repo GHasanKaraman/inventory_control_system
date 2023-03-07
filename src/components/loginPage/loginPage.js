@@ -118,7 +118,7 @@ const LoginPage = (props) => {
 
   return (
     <div>
-      <h5>v1.0</h5>
+      <h5>v1.1</h5>
       <Row align="center">
         <Col
           xs={{ span: 20, offset: 2 }}
