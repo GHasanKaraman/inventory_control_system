@@ -1,9 +1,9 @@
 import { notification } from "antd";
-import { get_orders } from "../ordersPage/ordersController";
-import { get_products } from "./homeController";
+import { getOrders } from "../../controllers/ordersController";
+import { getItems } from "../../controllers/itemsController";
 
 const openNotifications = async () => {
-  const orders = await get_orders();
+  const orders = await getOrders();
   if (orders.length > 0) {
     notification.info({
       message: "New Orders",
@@ -13,7 +13,7 @@ const openNotifications = async () => {
     });
   }
   return {};
-  const products = await get_products();
+  const products = await getItems();
 
   Object.values(products).map((item) => {
     if (item.count < Number(item.min_quantity)) {

@@ -1,6 +1,6 @@
 import { message } from "antd";
-import baseRequest from "../../core/baseRequest";
-import { fetchImage } from "../../utils/img2blob";
+import baseRequest from "../core/baseRequest";
+import { fetchImage } from "../utils/img2blob";
 
 const addOrder = async (values, form) => {
   let { file, count, from_where, parts, price, tags, status } = values;
@@ -46,7 +46,7 @@ function cr2st(current) {
   }
 }
 
-const get_orders = async () => {
+const getOrders = async () => {
   const response = await baseRequest.post("/order", {});
   if (response.data.status === "success") {
     const records = response.data.records;
@@ -62,7 +62,7 @@ const get_orders = async () => {
   }
 };
 
-const step_up = async (item) => {
+const stepUpOrder = async (item) => {
   let { _id, status } = item;
   status = cr2st(status + 1);
 
@@ -73,7 +73,7 @@ const step_up = async (item) => {
     message.error("Something went wrong while updating the status!");
   }
 };
-const delete_order = async (id) => {
+const deleteOrder = async (id) => {
   const res = await baseRequest.post("/home/delete", { id: id });
   if (res.data.status === "success") {
     message.success("Order has been successfully deleted!");
@@ -84,4 +84,4 @@ const delete_order = async (id) => {
   }
 };
 
-export { addOrder, get_orders, step_up, delete_order };
+export { addOrder, getOrders, stepUpOrder, deleteOrder };

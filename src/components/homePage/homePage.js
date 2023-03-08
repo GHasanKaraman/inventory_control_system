@@ -7,13 +7,16 @@ import { ConfigProvider, Layout, Menu, message, Typography } from "antd";
 import baseRequest from "../../core/baseRequest";
 
 import ModalRouter from "../../modals/modalRouter";
-
-import { ProductTable } from "../tableUtils";
-import { get_products, handleDelete, get_colors } from "./homeController";
-import { openNotifications } from "./notifications";
-import userAuth from "../../utils/userAuth.js";
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
+
+import { ProductTable } from "../tableUtils";
+
+import { getItems, deleteItem } from "../../controllers/itemsController";
+import { getLabels } from "../../controllers/labelsController";
+import { openNotifications } from "./notifications";
+
+import userAuth from "../../utils/userAuth.js";
 
 const { Sider, Content } = Layout;
 
@@ -42,12 +45,12 @@ const HomePage = (props) => {
   }, []);
 
   const load_products = async (res) => {
-    const products = await get_products(res);
+    const products = await getItems(res);
     setData(products);
   };
 
   const load_colors = async () => {
-    const colors = await get_colors();
+    const colors = await getLabels();
     setColorData(colors);
   };
 
@@ -125,7 +128,7 @@ const HomePage = (props) => {
                   dataSource={data}
                   tagColors={colorData}
                   onDelete={async (id, image) => {
-                    refreshTable(await handleDelete(id));
+                    refreshTable(await deleteItem(id));
                   }}
                   onGive={handleGive}
                   onRow={(record, _) => {

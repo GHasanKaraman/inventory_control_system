@@ -6,7 +6,6 @@ import {
   Form,
   Input,
   Button,
-  Typography,
   Upload,
   message,
   Image,
@@ -16,21 +15,19 @@ import {
 } from "antd";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
 
-import {
-  addItem,
-  get_labels,
-  tagRender,
-  get_locations,
-} from "./itemsController";
+import { addItem } from "../../controllers/itemsController";
+import { tagRender } from "../../controllers/labelsController";
 
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
+
+import { getLabels } from "../../controllers/labelsController";
+import { getLocations } from "../../controllers/locationsController";
 
 const { Content, Sider } = Layout;
 
 const ItemsPage = (props) => {
   const [form] = Form.useForm();
-
   const [data, setData] = useState([]);
   const [pageIndex, setPageIndex] = useState(0);
 
@@ -72,11 +69,11 @@ const ItemsPage = (props) => {
   };
 
   const load_items = async () => {
-    const labels = await get_labels();
+    const labels = await getLabels();
     setOptions(labels);
   };
   const load_locations = async () => {
-    const locations = await get_locations();
+    const locations = await getLocations();
     setData(locations);
   };
 

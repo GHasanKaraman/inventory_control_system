@@ -1,6 +1,6 @@
 import { Table, Tabs, Result, Layout, Row, ConfigProvider, Menu } from "antd";
 import { useEffect, useState } from "react";
-import { get_technicianLogs, get_qrLogs } from "./logsController";
+import { getTechnicianLogs, getQRLogs } from "../../controllers/logsController";
 
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
@@ -16,12 +16,12 @@ const LogsPage = (props) => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const load_technicianLogs = async () => {
-    const logs = await get_technicianLogs();
+    const logs = await getTechnicianLogs();
     setTechnicianLogs(logs);
   };
 
   const load_qrLogs = async () => {
-    const logs = await get_qrLogs();
+    const logs = await getQRLogs();
     setQRLogs(logs);
   };
 
@@ -91,7 +91,8 @@ const LogsPage = (props) => {
       >
         <Layout style={{ height: "100%" }}>
           <Sider>
-            <Menu defaultSelectedKeys={"5"}
+            <Menu
+              defaultSelectedKeys={"5"}
               theme="dark"
               mode="inline"
               items={menu.items}

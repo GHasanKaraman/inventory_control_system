@@ -15,7 +15,7 @@ import {
 import Highlighter from "react-highlight-words";
 import { SearchOutlined } from "@ant-design/icons";
 import PrintComponent from "../utils/print";
-import { get_racks } from "./locationsPage/locationController";
+import { getRacks } from "../controllers/locationsController";
 
 const { Option } = Select;
 
@@ -399,7 +399,7 @@ const EditableCell = ({
   const form = useContext(EditableContext);
 
   const load_racks = async () => {
-    const racks = await get_racks();
+    const racks = await getRacks();
     setOptions(
       racks.map((opt) => {
         return { value: opt.rack };

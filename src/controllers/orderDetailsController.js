@@ -1,5 +1,5 @@
 import { message } from "antd";
-import baseRequest from "../../core/baseRequest";
+import baseRequest from "../core/baseRequest";
 
 const transferOrder = async (id, values) => {
   const response = await baseRequest.post("/order/transfer", { id, values });

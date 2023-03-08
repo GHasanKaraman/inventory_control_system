@@ -15,15 +15,15 @@ import {
 } from "antd";
 
 import {
-  get_locations,
-  get_racks,
+  getLocations,
+  getRacks,
   addLocation,
   deleteLocation,
-  saveLocation,
+  updateLocation,
   addRack,
   deleteRack,
-  saveRack,
-} from "./locationController";
+  updateRack,
+} from "../../controllers/locationsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";
@@ -39,12 +39,12 @@ const LocationsPage = (props) => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const load_locations = async () => {
-    const locations = await get_locations();
+    const locations = await getLocations();
     setLocations(locations);
   };
 
   const load_racks = async () => {
-    const racks = await get_racks();
+    const racks = await getRacks();
     setRacks(racks);
   };
 
@@ -146,7 +146,7 @@ const LocationsPage = (props) => {
         title: col.title,
         type: col.type,
         handleSave: async (row) => {
-          await saveLocation(row);
+          await updateLocation(row);
           await load_locations();
         },
       }),
@@ -166,7 +166,7 @@ const LocationsPage = (props) => {
         title: col.title,
         type: col.type,
         handleSave: async (row) => {
-          await saveRack(row);
+          await updateRack(row);
           await load_racks();
         },
       }),
