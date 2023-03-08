@@ -1,7 +1,7 @@
 import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 
-const get_technicianLogs = async () => {
+const getTechnicianLogs = async () => {
   const res = await baseRequest.post("/logs/technicians", {});
   if (res.data.status == "success") {
     const { logs, users } = res.data.records;
@@ -31,7 +31,7 @@ const get_technicianLogs = async () => {
   }
 };
 
-const get_qrLogs = async () => {
+const getQRLogs = async () => {
   const res = await baseRequest.post("/logs/qr", {});
   if (res.data.status == "success") {
     const { logs } = res.data.records;
@@ -58,4 +58,4 @@ const get_qrLogs = async () => {
   }
 };
 
-export { get_technicianLogs, get_qrLogs };
+export { getTechnicianLogs, getQRLogs };

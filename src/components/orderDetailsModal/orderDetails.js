@@ -1,6 +1,6 @@
 import { Modal, Form, Button, Select, Input, Typography } from "antd";
 import { useEffect, useState } from "react";
-import { get_locations } from "../../controllers/itemsController";
+import { getLocations } from "../../controllers/locationsController";
 import { transferOrder } from "../../controllers/orderDetailsController";
 
 const OrderDetailsModal = (props) => {
@@ -10,7 +10,7 @@ const OrderDetailsModal = (props) => {
   const [open, setOpen] = useState(false);
 
   const load_locations = async () => {
-    const locations = await get_locations();
+    const locations = await getLocations();
     setData(locations);
   };
 

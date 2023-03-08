@@ -14,10 +14,10 @@ import {
 } from "antd";
 
 import {
-  get_technicians,
+  getTechnicians,
   addTechnician,
-  handleDelete,
-  handleSave,
+  deleteTechnician,
+  updateTechnician,
 } from "../../controllers/techniciansController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
@@ -31,7 +31,7 @@ const TechniciansPage = (props) => {
   const [pageIndex, setPageIndex] = useState(0);
 
   const load_technicians = async () => {
-    const technicians = await get_technicians();
+    const technicians = await getTechnicians();
     setData(technicians);
   };
 
@@ -57,7 +57,7 @@ const TechniciansPage = (props) => {
           <Popconfirm
             title="Sure to delete?"
             onConfirm={async () => {
-              await handleDelete(record._id);
+              await deleteTechnician(record._id);
               await load_technicians();
             }}
           >
@@ -86,7 +86,7 @@ const TechniciansPage = (props) => {
         title: col.title,
         type: col.type,
         handleSave: async (row) => {
-          await handleSave(row);
+          await updateTechnician(row);
           await load_technicians();
         },
       }),

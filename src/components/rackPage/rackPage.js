@@ -17,9 +17,12 @@ import {
 
 import { LoadingOutlined, PlusOutlined } from "@ant-design/icons";
 
-import { tagRender } from "../../controllers/itemsController";
+import { tagRender } from "../../controllers/labelsController";
 
-import { get_datas, addItem } from "../../controllers/rackController";
+import {
+  getDatasFromRack,
+  addItemFromRack,
+} from "../../controllers/rackController";
 
 const RackPage = (props) => {
   const params = useParams();
@@ -34,7 +37,7 @@ const RackPage = (props) => {
   const [rack, setRack] = useState("");
 
   const load_datas = async () => {
-    const datas = await get_datas(id);
+    const datas = await getDatasFromRack(id);
     setRack(datas.racks[0].rack);
     const locations = datas.locations.filter(
       (loc) => loc.rack == datas.racks[0].rack
@@ -136,7 +139,7 @@ const RackPage = (props) => {
               name="normal_login"
               onFinish={async (values) => {
                 values["file"] = file;
-                const status = await addItem(values, form);
+                const status = await addItemFromRack(values, form);
                 if (status == "success") {
                   setImageUrl(null);
                 }

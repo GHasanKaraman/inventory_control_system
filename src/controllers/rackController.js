@@ -1,7 +1,7 @@
 import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 
-const get_datas = async (id) => {
+const getDatasFromRack = async (id) => {
   const result = await baseRequest.post("/qr/rack", { _id: id });
   if (result.data.status === "success") {
     return {
@@ -14,7 +14,7 @@ const get_datas = async (id) => {
   }
 };
 
-const addItem = async (values, form) => {
+const addItemFromRack = async (values, form) => {
   let {
     file,
     count,
@@ -48,4 +48,4 @@ const addItem = async (values, form) => {
   return "failed";
 };
 
-export { get_datas, addItem };
+export { getDatasFromRack, addItemFromRack };

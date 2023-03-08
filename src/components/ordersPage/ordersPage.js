@@ -19,16 +19,17 @@ import {
 } from "antd";
 
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import { get_labels, tagRender } from "../../controllers/itemsController";
+import { tagRender } from "../../controllers/labelsController";
 import {
   addOrder,
-  get_orders,
-  step_up,
-  delete_order,
+  getOrders,
+  stepUpOrder,
+  deleteOrder,
 } from "../../controllers/ordersController";
 import OrderDetailsModal from "../orderDetailsModal/orderDetails";
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
+import { getLabels } from "../../controllers/labelsController";
 
 const { Content, Sider } = Layout;
 
@@ -48,12 +49,12 @@ const OrdersPage = (props) => {
   const [form] = Form.useForm();
 
   const load_items = async () => {
-    const labels = await get_labels();
+    const labels = await getLabels();
     setOptions(labels);
   };
 
   const load_orders = async () => {
-    const orders = await get_orders();
+    const orders = await getOrders();
     setOrders(orders);
   };
 
@@ -322,7 +323,7 @@ const OrdersPage = (props) => {
                     key="list-loadmore-edit"
                     onClick={async () => {
                       if (item.status != 2) {
-                        await step_up(item);
+                        await stepUpOrder(item);
                       } else {
                         setDetailsModal(true);
                         setSelectedItem(item);
@@ -335,7 +336,7 @@ const OrdersPage = (props) => {
                   <Popconfirm
                     title="Sure to delete?"
                     onConfirm={async () => {
-                      await delete_order(item._id);
+                      await deleteOrder(item._id);
                       load_orders();
                     }}
                   >

@@ -1,7 +1,7 @@
 import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 
-const get_locations = async () => {
+const getLocations = async () => {
   const res = await baseRequest.post("/location", {});
   if (res.data.status === "success") {
     const records = res.data.records;
@@ -36,7 +36,7 @@ const deleteLocation = async (id) => {
     message.error("Server didn't get the request properly!");
   }
 };
-const saveLocation = async (row) => {
+const updateLocation = async (row) => {
   const res = await baseRequest.post("/location/update", row);
   if (res.data.status === "success") {
     message.success("Location has been successfully updated!");
@@ -47,7 +47,7 @@ const saveLocation = async (row) => {
   }
 };
 
-const get_racks = async () => {
+const getRacks = async () => {
   const res = await baseRequest.post("/rack", {});
   if (res.data.status === "success") {
     const records = res.data.records;
@@ -82,7 +82,7 @@ const deleteRack = async (id) => {
     message.error("Server didn't get the request properly!");
   }
 };
-const saveRack = async (row) => {
+const updateRack = async (row) => {
   const res = await baseRequest.post("/rack/update", row);
   if (res.data.status === "success") {
     message.success("Rack has been successfully updated!");
@@ -94,12 +94,12 @@ const saveRack = async (row) => {
 };
 
 export {
-  get_locations,
+  getLocations,
   addLocation,
   deleteLocation,
-  saveLocation,
-  get_racks,
+  updateLocation,
+  getRacks,
   addRack,
   deleteRack,
-  saveRack,
+  updateRack,
 };

@@ -14,10 +14,10 @@ import {
 } from "antd";
 
 import {
-  get_labels,
+  getLabels,
   addLabel,
-  handleDelete,
-  handleSave,
+  deleteLabel,
+  updateLabel,
 } from "../../controllers/labelsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
@@ -51,7 +51,7 @@ const LabelsPage = (props) => {
   const [form] = Form.useForm();
 
   const load_labels = async () => {
-    const dataSource = await get_labels();
+    const dataSource = await getLabels();
     setData(dataSource);
   };
 
@@ -84,7 +84,7 @@ const LabelsPage = (props) => {
           <Popconfirm
             title="Sure to delete?"
             onConfirm={async () => {
-              await handleDelete(record._id);
+              await deleteLabel(record._id);
               await load_labels();
             }}
           >
@@ -113,7 +113,7 @@ const LabelsPage = (props) => {
         title: col.title,
         type: col.type,
         handleSave: async (row) => {
-          await handleSave(row);
+          await updateLabel(row);
           await load_labels();
         },
       }),

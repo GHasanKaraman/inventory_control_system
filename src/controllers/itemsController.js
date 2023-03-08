@@ -1,5 +1,5 @@
 import baseRequest from "../core/baseRequest";
-import { message, Tag } from "antd";
+import { message } from "antd";
 
 const addItem = async (values, form) => {
   let {
@@ -17,8 +17,6 @@ const addItem = async (values, form) => {
   values.from_where = from_where.toUpperCase();
   values.new_location = new_location.toUpperCase();
   values.tags = tags == undefined || tags.length == 0 ? "NTAG" : tags;
-
-  console.log(values.tags);
 
   const formData = new FormData();
   for (const name in values) {
@@ -38,7 +36,6 @@ const addItem = async (values, form) => {
 };
 
 const updateItem = async (values, id) => {
-  console.log(values.tags);
   if (values.tags.length > 1 && values.tags[0] === "NTAG") {
     values.tags.splice(0, 1);
   } else if (values.tags.length == 0) {
@@ -61,56 +58,29 @@ const updateItem = async (values, id) => {
   }
 };
 
-const get_labels = async () => {
-  const res = await baseRequest.post("/labels", {});
+const getItems = async (response) => {
+  const res = response ? response : await baseRequest.post("/home", {});
+  const records = res.data.records;
+  const dataSource = [];
+  for (let i = 0; i < Object.keys(records).length; i++) {
+    records[i].price = "$" + records[i].price.replace(".", ",");
+    records[i].total_price = "$" + records[i].total_price.replace(".", ",");
+    dataSource.push(Object.values(records)[i]);
+  }
+  return dataSource;
+};
+
+const deleteItem = async (id) => {
+  const res = await baseRequest.post("/home/delete", { id: id });
   if (res.data.status === "success") {
-    const records = res.data.records;
-    const dataSource = [];
-    for (let i = 0; i < Object.keys(records).length; i++) {
-      dataSource.push(Object.values(records)[i]);
-    }
-    return dataSource;
+    message.success("Item has been successfully deleted!");
+    return await getItems();
+  } else if (res.data.status === "failed!") {
+    message.error("Didn't delete the item!");
   } else {
-    message.error("Something went wrong while retrieving labels!");
-    return null;
+    message.error("Server didn't get the request properly!");
   }
+  return null;
 };
 
-const get_locations = async () => {
-  const res = await baseRequest.post("/location", {});
-  if (res.data.status === "success") {
-    const records = res.data.records;
-    const dataSource = [];
-    for (let i = 0; i < Object.keys(records).length; i++) {
-      dataSource.push(Object.values(records)[i]);
-    }
-    return dataSource;
-  } else if (res.data.status === "failed") {
-    message.error("Something went wrong while retrieving locations!");
-    return null;
-  }
-};
-
-const tagRender = (props) => {
-  const { options, e } = props;
-  const { _, value, closable, onClose } = e;
-  const onPreventMouseDown = (event) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
-  return options.filter((item) => item.name === value).length != 0 ? (
-    <Tag
-      color={options.filter((item) => item.name === value)[0].color}
-      onMouseDown={onPreventMouseDown}
-      closable={closable}
-      onClose={onClose}
-      style={{
-        marginRight: 3,
-      }}
-    >
-      {value}
-    </Tag>
-  ) : undefined;
-};
-
-export { addItem, get_labels, tagRender, updateItem, get_locations };
+export { addItem, updateItem, getItems, deleteItem };

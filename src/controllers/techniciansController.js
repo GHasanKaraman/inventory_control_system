@@ -1,7 +1,7 @@
 import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 
-const get_technicians = async () => {
+const getTechnicians = async () => {
   const res = await baseRequest.post("/technician", {});
   if (res.data.status === "success") {
     const records = res.data.records;
@@ -26,7 +26,7 @@ const addTechnician = async (values, form) => {
     form.resetFields();
   }
 };
-const handleDelete = async (id) => {
+const deleteTechnician = async (id) => {
   const res = await baseRequest.post("/technician/delete", { id: id });
   if (res.data.status === "success") {
     message.success("Technician has been successfully deleted!");
@@ -36,7 +36,7 @@ const handleDelete = async (id) => {
     message.error("Server didn't get the request properly!");
   }
 };
-const handleSave = async (row) => {
+const updateTechnician = async (row) => {
   const res = await baseRequest.post("/technician/update", row);
   if (res.data.status === "success") {
     message.success("Technician has been successfully updated!");
@@ -47,4 +47,4 @@ const handleSave = async (row) => {
   }
 };
 
-export { get_technicians, addTechnician, handleDelete, handleSave };
+export { getTechnicians, addTechnician, deleteTechnician, updateTechnician };
