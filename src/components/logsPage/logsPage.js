@@ -1,9 +1,24 @@
-import { Table, Tabs, Result, Layout, Row, ConfigProvider, Menu } from "antd";
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import {
+  Table,
+  Tabs,
+  Result,
+  Layout,
+  Row,
+  ConfigProvider,
+  Menu,
+  message,
+} from "antd";
 import { getTechnicianLogs, getQRLogs } from "../../controllers/logsController";
 
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
+
+import baseRequest from "../../core/baseRequest";
+import userAuth from "../../utils/userAuth";
+
+import { TIME } from "../../utils/const";
 
 const { Content, Sider } = Layout;
 
@@ -15,19 +30,41 @@ const LogsPage = (props) => {
 
   const [pageIndex, setPageIndex] = useState(0);
 
-  const load_technicianLogs = async () => {
-    const logs = await getTechnicianLogs();
+  const navigate = useNavigate();
+
+  const loadTechnicianLogs = async (res) => {
+    const logs = await getTechnicianLogs(res);
     setTechnicianLogs(logs);
   };
 
-  const load_qrLogs = async () => {
-    const logs = await getQRLogs();
+  const loadQRLogs = async (res) => {
+    const logs = await getQRLogs(res);
     setQRLogs(logs);
   };
 
+  const loadLogsPage = async () => {
+    const res = await baseRequest.post("/logs/qr", {});
+    const status = userAuth.control(res);
+    if (status) {
+      loadQRLogs(res);
+      loadTechnicianLogs();
+    } else {
+      message.error("You should sign in again!");
+      navigate("/login");
+    }
+  };
+
   useEffect(() => {
-    load_technicianLogs();
-    load_qrLogs();
+    loadLogsPage();
+  }, []);
+
+  useEffect(() => {
+    //This is for reloading home page
+    const interval = setInterval(() => {
+      loadLogsPage();
+    }, TIME);
+
+    return () => clearInterval(interval);
   }, []);
 
   const defaultColumns = [

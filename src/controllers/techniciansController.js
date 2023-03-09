@@ -1,8 +1,8 @@
 import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 
-const getTechnicians = async () => {
-  const res = await baseRequest.post("/technician", {});
+const getTechnicians = async (response) => {
+  const res = response ? response : await baseRequest.post("/technician", {});
   if (res.data.status === "success") {
     const records = res.data.records;
     const dataSource = [];

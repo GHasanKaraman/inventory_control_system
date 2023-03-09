@@ -14,9 +14,10 @@ import { ProductTable } from "../tableUtils";
 
 import { getItems, deleteItem } from "../../controllers/itemsController";
 import { getLabels } from "../../controllers/labelsController";
-import { openNotifications } from "./notifications";
 
 import userAuth from "../../utils/userAuth.js";
+
+import { TIME } from "../../utils/const";
 
 const { Sider, Content } = Layout;
 
@@ -30,26 +31,24 @@ const HomePage = (props) => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    load_colors();
     loadHomePage();
-    openNotifications();
   }, []);
 
   useEffect(() => {
     //This is for reloading home page
     const interval = setInterval(() => {
       loadHomePage();
-    }, 1000 * 60 * 20);
+    }, TIME);
 
     return () => clearInterval(interval);
   }, []);
 
-  const load_products = async (res) => {
+  const loadProducts = async (res) => {
     const products = await getItems(res);
     setData(products);
   };
 
-  const load_colors = async () => {
+  const loadColors = async () => {
     const colors = await getLabels();
     setColorData(colors);
   };
@@ -58,7 +57,8 @@ const HomePage = (props) => {
     const res = await baseRequest.post("/home", {});
     const status = userAuth.control(res);
     if (status) {
-      load_products(res);
+      loadProducts(res);
+      loadColors();
       setUser(res.data.user[0]);
     } else {
       message.error("You should sign in again!");

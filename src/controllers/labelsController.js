@@ -2,8 +2,8 @@ import baseRequest from "../core/baseRequest";
 
 import { message, Tag } from "antd";
 
-const getLabels = async () => {
-  const res = await baseRequest.post("/labels", {});
+const getLabels = async (response) => {
+  const res = response ? response : await baseRequest.post("/labels", {});
   if (res.data.status === "success") {
     return Object.values(res.data.records);
   } else if (res.data.status === "failed") {
@@ -14,6 +14,7 @@ const getLabels = async () => {
 
 const addLabel = async (values) => {
   const res = await baseRequest.post("/labels/add", values);
+  console.log(res);
   if (res.data.error && res.data.error.code) {
     if (res.data.error.code === 11000) {
       message.error("This label already exists!");

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Form,
   Input,
@@ -6,11 +7,10 @@ import {
   ConfigProvider,
   Layout,
   Menu,
-  Typography,
   Row,
   Table,
   Popconfirm,
-  Space,
+  message,
 } from "antd";
 
 import {
@@ -24,19 +24,46 @@ import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
 
+import baseRequest from "../../core/baseRequest";
+import userAuth from "../../utils/userAuth";
+
+import { TIME } from "../../utils/const";
+
 const { Sider, Content } = Layout;
 
 const TechniciansPage = (props) => {
   const [data, setData] = useState();
   const [pageIndex, setPageIndex] = useState(0);
 
-  const load_technicians = async () => {
-    const technicians = await getTechnicians();
+  const navigate = useNavigate();
+
+  const loadTechnicians = async (res) => {
+    const technicians = await getTechnicians(res);
     setData(technicians);
   };
 
+  const loadTechniciansPage = async () => {
+    const res = await baseRequest.post("/technician", {});
+    const status = userAuth.control(res);
+    if (status) {
+      loadTechnicians(res);
+    } else {
+      message.error("You should sign in again!");
+      navigate("/login");
+    }
+  };
+
   useEffect(() => {
-    load_technicians();
+    loadTechniciansPage();
+  }, []);
+
+  useEffect(() => {
+    //This is for reloading home page
+    const interval = setInterval(() => {
+      loadTechniciansPage();
+    }, TIME);
+
+    return () => clearInterval(interval);
   }, []);
 
   const [form] = Form.useForm();
@@ -58,7 +85,7 @@ const TechniciansPage = (props) => {
             title="Sure to delete?"
             onConfirm={async () => {
               await deleteTechnician(record._id);
-              await load_technicians();
+              await loadTechnicians();
             }}
           >
             <a>Delete</a>
@@ -87,7 +114,7 @@ const TechniciansPage = (props) => {
         type: col.type,
         handleSave: async (row) => {
           await updateTechnician(row);
-          await load_technicians();
+          await loadTechnicians();
         },
       }),
     };
@@ -129,7 +156,7 @@ const TechniciansPage = (props) => {
                   form={form}
                   onFinish={async (values) => {
                     await addTechnician(values, form);
-                    await load_technicians();
+                    await loadTechnicians();
                   }}
                 >
                   <Form.Item
