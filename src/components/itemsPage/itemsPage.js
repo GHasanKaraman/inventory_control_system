@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-
+import { useNavigate } from "react-router-dom";
 import {
   Layout,
   Select,
@@ -24,6 +24,11 @@ import * as menu from "../menu";
 import { getLabels } from "../../controllers/labelsController";
 import { getLocations } from "../../controllers/locationsController";
 
+import userAuth from "../../utils/userAuth.js";
+import baseRequest from "../../core/baseRequest";
+
+import { TIME } from "../../utils/const";
+
 const { Content, Sider } = Layout;
 
 const ItemsPage = (props) => {
@@ -35,6 +40,8 @@ const ItemsPage = (props) => {
   const [imageUrl, setImageUrl] = useState();
   const [options, setOptions] = useState([{ value: "gold" }]);
   const [file, setFile] = useState(null);
+
+  const navigate = useNavigate();
 
   const handleChange = (info) => {
     if (info.file.status === "uploading") {
@@ -68,21 +75,42 @@ const ItemsPage = (props) => {
     return isJpgOrPng && isLt2M;
   };
 
-  const load_items = async () => {
-    const labels = await getLabels();
+  const loadItems = async (res) => {
+    const labels = await getLabels(res);
     setOptions(labels);
   };
-  const load_locations = async () => {
-    const locations = await getLocations();
+  const loadLocations = async (res) => {
+    const locations = await getLocations(res);
     setData(locations);
+  };
+
+  const loadItemsPage = async () => {
+    const res = await baseRequest.post("/location", {});
+
+    const status = userAuth.control(res);
+    if (status) {
+      loadLocations(res);
+      loadItems();
+    } else {
+      message.error("You should sign in again!");
+      navigate("/login");
+    }
   };
 
   useEffect(() => {
     form.resetFields();
     setImageUrl(null);
 
-    load_items();
-    load_locations();
+    loadItemsPage();
+  }, []);
+
+  useEffect(() => {
+    //This is for reloading home page
+    const interval = setInterval(() => {
+      loadItemsPage();
+    }, TIME);
+
+    return () => clearInterval(interval);
   }, []);
 
   const uploadButton = (

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Form,
   Input,
@@ -11,6 +12,7 @@ import {
   Layout,
   ConfigProvider,
   Menu,
+  message,
 } from "antd";
 
 import {
@@ -23,6 +25,8 @@ import {
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
+import baseRequest from "../../core/baseRequest";
+import userAuth from "../../utils/userAuth";
 
 const { Option } = Select;
 const { Content, Sider } = Layout;
@@ -50,13 +54,35 @@ const LabelsPage = (props) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [form] = Form.useForm();
 
-  const load_labels = async () => {
-    const dataSource = await getLabels();
+  const navigate = useNavigate();
+
+  const loadLabels = async (res) => {
+    const dataSource = await getLabels(res);
     setData(dataSource);
   };
 
+  const loadLabelsPage = async () => {
+    const res = await baseRequest.post("/labels", {});
+    const status = userAuth.control(res);
+    if (status) {
+      loadLabels(res);
+    } else {
+      message.error("You should sign in again!");
+      navigate("/login");
+    }
+  };
+
   useEffect(() => {
-    load_labels();
+    loadLabelsPage();
+  }, []);
+
+  useEffect(() => {
+    //This is for reloading home page
+    const interval = setInterval(() => {
+      loadLabelsPage();
+    }, 1000 * 60 * 20);
+
+    return () => clearInterval(interval);
   }, []);
 
   const defaultColumns = [
@@ -85,7 +111,7 @@ const LabelsPage = (props) => {
             title="Sure to delete?"
             onConfirm={async () => {
               await deleteLabel(record._id);
-              await load_labels();
+              await loadLabelsPage();
             }}
           >
             <a>Delete</a>
@@ -114,7 +140,7 @@ const LabelsPage = (props) => {
         type: col.type,
         handleSave: async (row) => {
           await updateLabel(row);
-          await load_labels();
+          await loadLabelsPage();
         },
       }),
     };
@@ -157,7 +183,7 @@ const LabelsPage = (props) => {
                   form={form}
                   onFinish={async (values) => {
                     await addLabel(values, form);
-                    await load_labels();
+                    await loadLabelsPage();
                   }}
                 >
                   <Form.Item

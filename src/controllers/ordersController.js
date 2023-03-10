@@ -46,17 +46,17 @@ function cr2st(current) {
   }
 }
 
-const getOrders = async () => {
-  const response = await baseRequest.post("/order", {});
-  if (response.data.status === "success") {
-    const records = response.data.records;
+const getOrders = async (response) => {
+  const res = response ? response : await baseRequest.post("/order", {});
+  if (res.data.status === "success") {
+    const records = res.data.records;
     const values = Object.values(records);
     for (let i = 0; i < values.length; i++) {
       values[i].image = await fetchImage(values[i].image);
       values[i].status = st2cr(values[i].status);
     }
     return values;
-  } else if (response.data.status === "failed") {
+  } else if (res.data.status === "failed") {
     message.error("Something went wrong while retrieving orders! Try again.");
     return null;
   }

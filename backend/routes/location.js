@@ -32,6 +32,35 @@ router.post("/location", async (req, res) => {
   }
 });
 
+router.post("/location/nonused", async (req, res) => {
+  const locs = await locationModel.aggregate([
+    {
+      $lookup: {
+        from: "products",
+        localField: "location",
+        foreignField: "new_location",
+        as: "matched_docs",
+      },
+    },
+    {
+      $match: {
+        matched_docs: { $eq: [] },
+      },
+    },
+  ]);
+
+  if (locs) {
+    res.json({
+      status: "success",
+      records: { ...locs },
+    });
+    console.log("Retrieved locations!");
+  } else {
+    res.json({ status: "failed" });
+    console.log("\x1b[31m%s\x1b[0m", "Didn't retrieve locations!");
+  }
+});
+
 router.post("/location/add", async (req, res) => {
   try {
     const { location, rack } = req.body;

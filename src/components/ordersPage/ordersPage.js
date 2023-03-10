@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   ConfigProvider,
   Menu,
@@ -19,17 +20,23 @@ import {
 } from "antd";
 
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-import { tagRender } from "../../controllers/labelsController";
 import {
   addOrder,
   getOrders,
   stepUpOrder,
   deleteOrder,
 } from "../../controllers/ordersController";
+import { getLabels, tagRender } from "../../controllers/labelsController";
+
 import OrderDetailsModal from "../orderDetailsModal/orderDetails";
+
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
-import { getLabels } from "../../controllers/labelsController";
+
+import baseRequest from "../../core/baseRequest";
+import userAuth from "../../utils/userAuth";
+
+import { TIME } from "../../utils/const";
 
 const { Content, Sider } = Layout;
 
@@ -48,21 +55,41 @@ const OrdersPage = (props) => {
 
   const [form] = Form.useForm();
 
-  const load_items = async () => {
+  const navigate = useNavigate();
+
+  const loadLabels = async (res) => {
     const labels = await getLabels();
     setOptions(labels);
   };
 
-  const load_orders = async () => {
-    const orders = await getOrders();
+  const loadOrders = async (res) => {
+    const orders = await getOrders(res);
     setOrders(orders);
   };
 
+  const loadOrdersPage = async () => {
+    const res = await baseRequest.post("/order", {});
+    const status = userAuth.control(res);
+    if (status) {
+      loadLabels(res);
+      loadOrders();
+    } else {
+      message.error("You should sign in again!");
+      navigate("/login");
+    }
+  };
+
   useEffect(() => {
-    load_orders();
-    load_items();
+    loadOrdersPage();
   }, []);
 
+  useEffect(() => {
+    //This is for reloading home page
+    const interval = setInterval(() => {
+      loadOrdersPage();
+    }, TIME);
+    return () => clearInterval(interval);
+  }, []);
   const handleChange = (info) => {
     if (info.file.status === "uploading") {
       setLoading(true);
@@ -328,7 +355,7 @@ const OrdersPage = (props) => {
                         setDetailsModal(true);
                         setSelectedItem(item);
                       }
-                      load_orders();
+                      loadOrdersPage();
                     }}
                   >
                     Step
@@ -337,7 +364,7 @@ const OrdersPage = (props) => {
                     title="Sure to delete?"
                     onConfirm={async () => {
                       await deleteOrder(item._id);
-                      load_orders();
+                      loadOrdersPage();
                     }}
                   >
                     <Button type="link" key="list-loadmore-more">
@@ -415,7 +442,7 @@ const OrdersPage = (props) => {
                     items={tabs}
                     onTabClick={(e) => {
                       if (e == 2) {
-                        load_orders();
+                        loadOrdersPage();
                       }
                     }}
                   ></Tabs>
@@ -428,7 +455,7 @@ const OrdersPage = (props) => {
 
       <OrderDetailsModal
         item={selectedItem}
-        reload={load_orders}
+        reload={loadOrdersPage}
         open={detailsModal}
         onCancel={() => {
           setDetailsModal(false);

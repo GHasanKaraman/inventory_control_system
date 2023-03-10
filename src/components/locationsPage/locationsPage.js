@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Form,
   Input,
@@ -12,10 +13,11 @@ import {
   Layout,
   Select,
   Tabs,
+  message,
 } from "antd";
 
 import {
-  getLocations,
+  getNonUsedLocations,
   getRacks,
   addLocation,
   deleteLocation,
@@ -30,6 +32,11 @@ import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
 import PrintComponent from "../../utils/print";
 
+import baseRequest from "../../core/baseRequest";
+import userAuth from "../../utils/userAuth";
+
+import { TIME } from "../../utils/const";
+
 const { Content, Sider } = Layout;
 
 const LocationsPage = (props) => {
@@ -38,19 +45,41 @@ const LocationsPage = (props) => {
 
   const [pageIndex, setPageIndex] = useState(0);
 
-  const load_locations = async () => {
-    const locations = await getLocations();
+  const navigate = useNavigate();
+
+  const loadNonUsedLocations = async (res) => {
+    const locations = await getNonUsedLocations(res);
     setLocations(locations);
   };
 
-  const load_racks = async () => {
-    const racks = await getRacks();
+  const loadRacks = async (res) => {
+    const racks = await getRacks(res);
     setRacks(racks);
   };
 
+  const loadLocationsPage = async () => {
+    const res = await baseRequest.post("/location/nonused", {});
+    const status = userAuth.control(res);
+    if (status) {
+      loadNonUsedLocations(res);
+      loadRacks();
+    } else {
+      message.error("You should sign in again!");
+      navigate("/login");
+    }
+  };
+
   useEffect(() => {
-    load_locations();
-    load_racks();
+    loadLocationsPage();
+  }, []);
+
+  useEffect(() => {
+    //This is for reloading home page
+    const interval = setInterval(() => {
+      loadLocationsPage();
+    }, TIME);
+
+    return () => clearInterval(interval);
   }, []);
 
   const [rackForm] = Form.useForm();
@@ -81,7 +110,7 @@ const LocationsPage = (props) => {
             title="Sure to delete?"
             onConfirm={async () => {
               await deleteLocation(record._id);
-              await load_locations();
+              await loadLocationsPage();
             }}
           >
             <a>Delete</a>
@@ -117,7 +146,7 @@ const LocationsPage = (props) => {
             title="Sure to delete?"
             onConfirm={async () => {
               await deleteRack(record._id);
-              await load_racks();
+              await loadLocationsPage();
             }}
           >
             <a>Delete</a>
@@ -147,7 +176,7 @@ const LocationsPage = (props) => {
         type: col.type,
         handleSave: async (row) => {
           await updateLocation(row);
-          await load_locations();
+          await loadLocationsPage();
         },
       }),
     };
@@ -167,7 +196,7 @@ const LocationsPage = (props) => {
         type: col.type,
         handleSave: async (row) => {
           await updateRack(row);
-          await load_racks();
+          await loadLocationsPage();
         },
       }),
     };
@@ -189,7 +218,7 @@ const LocationsPage = (props) => {
               form={locationForm}
               onFinish={async (values) => {
                 await addLocation(values, locationForm);
-                await load_locations();
+                await loadLocationsPage();
               }}
             >
               <Form.Item
@@ -275,7 +304,7 @@ const LocationsPage = (props) => {
               form={rackForm}
               onFinish={async (values) => {
                 await addRack(values, rackForm);
-                await load_racks();
+                await loadLocationsPage();
               }}
             >
               <Form.Item

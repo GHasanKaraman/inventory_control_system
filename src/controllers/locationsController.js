@@ -1,8 +1,22 @@
 import { message } from "antd";
 import baseRequest from "../core/baseRequest";
 
-const getLocations = async () => {
-  const res = await baseRequest.post("/location", {});
+const getLocations = async (response) => {
+  const res = response ? response : await baseRequest.post("/location", {});
+  if (res.data.status === "success") {
+    const records = res.data.records;
+    const dataSource = [];
+    for (let i = 0; i < Object.keys(records).length; i++) {
+      dataSource.push(Object.values(records)[i]);
+    }
+    return dataSource;
+  } else if (res.data.status === "failed") {
+    message.error("Something went wrong while retrieving locations!");
+  }
+};
+
+const getNonUsedLocations = async (response) => {
+  const res = response ? response : await baseRequest.post("/location/nonused", {});
   if (res.data.status === "success") {
     const records = res.data.records;
     const dataSource = [];
@@ -47,8 +61,8 @@ const updateLocation = async (row) => {
   }
 };
 
-const getRacks = async () => {
-  const res = await baseRequest.post("/rack", {});
+const getRacks = async (response) => {
+  const res = response ? response : await baseRequest.post("/rack", {});
   if (res.data.status === "success") {
     const records = res.data.records;
     const dataSource = [];
@@ -95,6 +109,7 @@ const updateRack = async (row) => {
 
 export {
   getLocations,
+  getNonUsedLocations,
   addLocation,
   deleteLocation,
   updateLocation,
