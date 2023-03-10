@@ -12,6 +12,7 @@ const qr = require("./routes/qr.js");
 const user = require("./routes/user.js");
 const rack = require("./routes/rack.js");
 const logs = require("./routes/logs.js");
+const vendor = require("./routes/vendor.js");
 const products = require("./routes/products.js");
 const auth = require("./routes/auth.js");
 
@@ -97,6 +98,7 @@ db.once("open", function () {
   app.use("/", technician);
   app.use("/", location);
   app.use("/", rack);
+  app.use("/", vendor);
   app.use("/", logs);
   app.use("/", products);
 

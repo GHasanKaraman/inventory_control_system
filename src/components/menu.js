@@ -7,6 +7,7 @@ import {
   ToolFilled,
   BookFilled,
   DatabaseOutlined,
+  ShopOutlined,
   CarOutlined,
 } from "@ant-design/icons";
 
@@ -17,6 +18,7 @@ export const items = [
   ToolFilled,
   BookFilled,
   DatabaseOutlined,
+  ShopOutlined,
   CarOutlined,
   LogoutOutlined,
 ].map((icon, index) => ({
@@ -29,6 +31,7 @@ export const items = [
     "Technicians",
     "Logs",
     "Locations",
+    "Vendors",
     "Orders",
     "Log Out",
   ][index],

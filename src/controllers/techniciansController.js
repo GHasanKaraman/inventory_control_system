@@ -11,7 +11,7 @@ const getTechnicians = async (response) => {
     }
     return dataSource;
   } else if (res.data.status === "failed") {
-    message.error("Something went wrong while retrieving labels!");
+    message.error("Something went wrong while retrieving technicians!");
   }
 };
 
