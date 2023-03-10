@@ -31,9 +31,12 @@ const MenuSelector = (props) => {
         navigate("/locations");
         break;
       case 7:
-        navigate("/orders");
+        navigate("/vendors");
         break;
       case 8:
+        navigate("/orders");
+        break;
+      case 9:
         logout();
         navigate("/login");
         break;
