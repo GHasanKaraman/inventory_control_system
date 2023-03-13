@@ -8,6 +8,7 @@ const getDatasFromRack = async (id) => {
       labels: Object.values(result.data.labels),
       locations: Object.values(result.data.locations),
       racks: Object.values(result.data.racks),
+      vendors: Object.values(result.data.vendors),
     };
   } else {
     return { labels: [], locations: [], racks: [] };

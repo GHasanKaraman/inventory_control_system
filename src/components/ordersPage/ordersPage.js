@@ -418,7 +418,7 @@ const OrdersPage = (props) => {
           <Layout style={{ height: "100%" }}>
             <Sider>
               <Menu
-                defaultSelectedKeys={"7"}
+                defaultSelectedKeys={"8"}
                 theme="dark"
                 mode="inline"
                 items={menu.items}

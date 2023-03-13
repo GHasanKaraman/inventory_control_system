@@ -12,19 +12,16 @@ import {
   Image,
 } from "antd";
 import { PlusOutlined, LoadingOutlined } from "@ant-design/icons";
-
-import {
-  addItem,
-  get_labels,
-  tagRender,
-  updateItem,
-  get_locations,
-} from "./itemsController";
+import { addItem, updateItem } from "../../controllers/itemsController";
+import { getVendors } from "../../controllers/vendorsController";
+import { getLabels, tagRender } from "../../controllers/labelsController";
+import { getLocations } from "../../controllers/locationsController";
 
 const ItemsModal = (props) => {
   const [form] = Form.useForm();
 
-  const [data, setData] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [vendors, setVendors] = useState([]);
 
   const [id, setID] = useState();
   const [loading, setLoading] = useState(false);
@@ -65,18 +62,23 @@ const ItemsModal = (props) => {
   };
 
   const load_items = async () => {
-    const labels = await get_labels();
+    const labels = await getLabels();
     setOptions(labels);
   };
-  const load_locations = async () => {
-    const locations = await get_locations();
-    setData(locations);
+  const loadLocations = async () => {
+    const locations = await getLocations();
+    setLocations(locations);
+  };
+  const loadVendors = async () => {
+    const vendors = await getVendors();
+    setVendors(vendors);
   };
 
   useEffect(() => {
     if (props.open) {
       load_items();
-      load_locations();
+      loadLocations();
+      loadVendors();
       if (props.product) {
         form.setFieldsValue(props.product);
         setID(props.product.id);
@@ -264,14 +266,14 @@ const ItemsModal = (props) => {
 
         <Form.Item
           name="from_where"
-          rules={[
-            {
-              required: true,
-              message: "Please enter where did you get this item from!",
-            },
-          ]}
+          rules={[{ required: true, message: "Please enter a vendor name!" }]}
         >
-          <Input placeholder="Vendor" />
+          <Select
+            placeholder="Vendor"
+            options={vendors.map((item) => {
+              return { value: item.vendor };
+            })}
+          ></Select>
         </Form.Item>
         <Form.Item
           name="min_quantity"
@@ -307,8 +309,8 @@ const ItemsModal = (props) => {
         >
           <Select
             placeholder="Location"
-            options={data.map((loc) => {
-              return { value: loc.location };
+            options={locations.map((item) => {
+              return { value: item.location };
             })}
           ></Select>
         </Form.Item>
