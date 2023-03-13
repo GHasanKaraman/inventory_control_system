@@ -23,31 +23,34 @@ import {
   getDatasFromRack,
   addItemFromRack,
 } from "../../controllers/rackController";
+import { getVendors } from "../../controllers/vendorsController";
 
 const RackPage = (props) => {
   const params = useParams();
   const { id } = params;
   const [form] = Form.useForm();
 
-  const [data, setData] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [loading, setLoading] = useState(false);
   const [imageUrl, setImageUrl] = useState();
   const [options, setOptions] = useState([{ value: "gold" }]);
   const [file, setFile] = useState(null);
   const [rack, setRack] = useState("");
 
-  const load_datas = async () => {
+  const loadRackPage = async () => {
     const datas = await getDatasFromRack(id);
     setRack(datas.racks[0].rack);
     const locations = datas.locations.filter(
-      (loc) => loc.rack == datas.racks[0].rack
+      (item) => item.rack == datas.racks[0].rack
     );
     setOptions(datas.labels);
-    setData(locations);
+    setVendors(datas.vendors);
+    setLocations(locations);
   };
 
   useEffect(() => {
-    load_datas();
+    loadRackPage();
   }, []);
 
   const handleChange = (info) => {
@@ -272,13 +275,15 @@ const RackPage = (props) => {
               <Form.Item
                 name="from_where"
                 rules={[
-                  {
-                    required: true,
-                    message: "Please enter where did you get this item from!",
-                  },
+                  { required: true, message: "Please enter a vendor name!" },
                 ]}
               >
-                <Input placeholder="Vendor" />
+                <Select
+                  placeholder="Vendor"
+                  options={vendors.map((item) => {
+                    return { value: item.vendor };
+                  })}
+                ></Select>
               </Form.Item>
               <Form.Item
                 name="min_quantity"
@@ -316,8 +321,8 @@ const RackPage = (props) => {
               >
                 <Select
                   placeholder="Location"
-                  options={data.map((loc) => {
-                    return { value: loc.location };
+                  options={locations.map((item) => {
+                    return { value: item.location };
                   })}
                 ></Select>
               </Form.Item>

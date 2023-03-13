@@ -9,6 +9,7 @@ const technicianModel = require("../models/technician");
 const labelModel = require("../models/label");
 const locationModel = require("../models/location");
 const rackModel = require("../models/rack");
+const vendorModel = require("../models/vendor");
 
 router.post("/qr", async (req, res) => {
   try {
@@ -102,6 +103,7 @@ router.post("/qr/rack", async (req, res) => {
   try {
     const { _id } = req.body;
     const labels = await labelModel.find({});
+    const vendors = await vendorModel.find({});
     const locs = await locationModel.find({});
     const racks = await rackModel.find({ _id: _id });
     if (labels && locs && racks) {
@@ -110,6 +112,7 @@ router.post("/qr/rack", async (req, res) => {
         labels: labels,
         locations: locs,
         racks: racks,
+        vendors: vendors,
       });
       console.log("Retrieved datas!");
     } else {

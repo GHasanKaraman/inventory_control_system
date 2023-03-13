@@ -23,6 +23,7 @@ import * as menu from "../menu";
 
 import { getLabels } from "../../controllers/labelsController";
 import { getLocations } from "../../controllers/locationsController";
+import { getVendors } from "../../controllers/vendorsController";
 
 import userAuth from "../../utils/userAuth.js";
 import baseRequest from "../../core/baseRequest";
@@ -33,7 +34,8 @@ const { Content, Sider } = Layout;
 
 const ItemsPage = (props) => {
   const [form] = Form.useForm();
-  const [data, setData] = useState([]);
+  const [locations, setLocations] = useState([]);
+  const [vendors, setVendors] = useState([]);
   const [pageIndex, setPageIndex] = useState(0);
 
   const [loading, setLoading] = useState(false);
@@ -81,7 +83,12 @@ const ItemsPage = (props) => {
   };
   const loadLocations = async (res) => {
     const locations = await getLocations(res);
-    setData(locations);
+    setLocations(locations);
+  };
+
+  const loadVendors = async (res) => {
+    const vendors = await getVendors(res);
+    setVendors(vendors);
   };
 
   const loadItemsPage = async () => {
@@ -90,6 +97,7 @@ const ItemsPage = (props) => {
     const status = userAuth.control(res);
     if (status) {
       loadLocations(res);
+      loadVendors();
       loadItems();
     } else {
       message.error("You should sign in again!");
@@ -306,14 +314,15 @@ const ItemsPage = (props) => {
                   <Form.Item
                     name="from_where"
                     rules={[
-                      {
-                        required: true,
-                        message:
-                          "Please enter where did you get this item from!",
-                      },
+                      { required: true, message: "Please enter a vendor name!" },
                     ]}
                   >
-                    <Input placeholder="Vendor" />
+                    <Select
+                      placeholder="Vendor"
+                      options={vendors.map((item) => {
+                        return { value: item.vendor };
+                      })}
+                    ></Select>
                   </Form.Item>
                   <Form.Item
                     name="min_quantity"
@@ -351,8 +360,8 @@ const ItemsPage = (props) => {
                   >
                     <Select
                       placeholder="Location"
-                      options={data.map((loc) => {
-                        return { value: loc.location };
+                      options={locations.map((item) => {
+                        return { value: item.location };
                       })}
                     ></Select>
                   </Form.Item>
