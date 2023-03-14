@@ -93,7 +93,6 @@ const NotificationsPage = (props) => {
                   </List.Item>
                 )}
               />
-              <Row justify={"center"}></Row>
             </Content>
           </Layout>
         </Layout>
