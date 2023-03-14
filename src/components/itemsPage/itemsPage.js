@@ -24,6 +24,7 @@ import * as menu from "../menu";
 import { getLabels } from "../../controllers/labelsController";
 import { getLocations } from "../../controllers/locationsController";
 import { getVendors } from "../../controllers/vendorsController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import userAuth from "../../utils/userAuth.js";
 import baseRequest from "../../core/baseRequest";
@@ -42,6 +43,8 @@ const ItemsPage = (props) => {
   const [imageUrl, setImageUrl] = useState();
   const [options, setOptions] = useState([{ value: "gold" }]);
   const [file, setFile] = useState(null);
+
+  const [notificationsLength, setNotificationsLength] = useState(0);
 
   const navigate = useNavigate();
 
@@ -91,6 +94,11 @@ const ItemsPage = (props) => {
     setVendors(vendors);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadItemsPage = async () => {
     const res = await baseRequest.post("/location", {});
 
@@ -99,6 +107,7 @@ const ItemsPage = (props) => {
       loadLocations(res);
       loadVendors();
       loadItems();
+      loadNotifications();
     } else {
       message.error("You should sign in again!");
       navigate("/login");
@@ -164,7 +173,7 @@ const ItemsPage = (props) => {
               defaultSelectedKeys={"2"}
               theme="dark"
               mode="inline"
-              items={menu.items}
+              items={menu.items(notificationsLength)}
               onClick={(item) => {
                 setPageIndex({ key: item.key });
               }}
@@ -314,7 +323,10 @@ const ItemsPage = (props) => {
                   <Form.Item
                     name="from_where"
                     rules={[
-                      { required: true, message: "Please enter a vendor name!" },
+                      {
+                        required: true,
+                        message: "Please enter a vendor name!",
+                      },
                     ]}
                   >
                     <Select

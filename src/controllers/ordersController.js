@@ -1,6 +1,5 @@
 import { message } from "antd";
 import baseRequest from "../core/baseRequest";
-import { fetchImage } from "../utils/img2blob";
 
 const addOrder = async (values, form) => {
   let { file, count, from_where, parts, price, tags, status } = values;
@@ -52,7 +51,6 @@ const getOrders = async (response) => {
     const records = res.data.records;
     const values = Object.values(records);
     for (let i = 0; i < values.length; i++) {
-      values[i].image = await fetchImage(values[i].image);
       values[i].status = st2cr(values[i].status);
     }
     return values;

@@ -21,6 +21,7 @@ import {
   deleteLabel,
   updateLabel,
 } from "../../controllers/labelsController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";
@@ -54,6 +55,8 @@ const LabelsPage = (props) => {
   const [pageIndex, setPageIndex] = useState(0);
   const [form] = Form.useForm();
 
+  const [notificationsLength, setNotificationsLength] = useState(0);
+
   const navigate = useNavigate();
 
   const loadLabels = async (res) => {
@@ -61,11 +64,17 @@ const LabelsPage = (props) => {
     setData(dataSource);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadLabelsPage = async () => {
     const res = await baseRequest.post("/labels", {});
     const status = userAuth.control(res);
     if (status) {
       loadLabels(res);
+      loadNotifications();
     } else {
       message.error("You should sign in again!");
       navigate("/login");
@@ -162,7 +171,7 @@ const LabelsPage = (props) => {
               defaultSelectedKeys={"3"}
               theme="dark"
               mode="inline"
-              items={menu.items}
+              items={menu.items(notificationsLength)}
               onClick={(item) => {
                 setPageIndex({ key: item.key });
               }}

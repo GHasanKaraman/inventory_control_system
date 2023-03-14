@@ -8,10 +8,12 @@ import {
   BookFilled,
   DatabaseOutlined,
   ShopOutlined,
+  BellOutlined,
   CarOutlined,
 } from "@ant-design/icons";
+import { Badge } from "antd";
 
-export const items = [
+const ICONS = [
   HomeOutlined,
   UploadOutlined,
   TagsOutlined,
@@ -20,19 +22,33 @@ export const items = [
   DatabaseOutlined,
   ShopOutlined,
   CarOutlined,
+  BellOutlined,
   LogoutOutlined,
-].map((icon, index) => ({
-  key: index + 1,
-  icon: React.createElement(icon),
-  label: [
-    "Home",
-    "Add New Item",
-    "Labels",
-    "Technicians",
-    "Logs",
-    "Locations",
-    "Vendors",
-    "Orders",
-    "Log Out",
-  ][index],
-}));
+];
+
+const labels = (notify) => [
+  "Home",
+  "Add New Item",
+  "Labels",
+  "Technicians",
+  "Logs",
+  "Locations",
+  "Vendors",
+  "Orders",
+  notify ? (
+    <span>
+      Notifications
+      <Badge style={{ marginLeft: "5px" }} size="small" count={notify}></Badge>
+    </span>
+  ) : (
+    "Notifications"
+  ),
+  "Log Out",
+];
+
+export const items = (notify = false) =>
+  ICONS.map((icon, index) => ({
+    key: index + 1,
+    icon: React.createElement(icon),
+    label: labels(notify)[index],
+  }));
