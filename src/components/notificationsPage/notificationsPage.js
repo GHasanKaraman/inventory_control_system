@@ -86,7 +86,7 @@ const NotificationsPage = (props) => {
                 renderItem={(item, index) => (
                   <List.Item>
                     <List.Item.Meta
-                      avatar={<Avatar src={item.image} />}
+                      avatar={<Avatar size={64} src={item.image} />}
                       title={<p>{item.message}</p>}
                       description={item.description}
                     />

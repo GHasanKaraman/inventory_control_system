@@ -14,6 +14,7 @@ import { ProductTable } from "../tableUtils";
 
 import { getItems, deleteItem } from "../../controllers/itemsController";
 import { getLabels } from "../../controllers/labelsController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import userAuth from "../../utils/userAuth.js";
 
@@ -27,6 +28,8 @@ const HomePage = (props) => {
   const [user, setUser] = useState();
   const [data, setData] = useState();
   const [colorData, setColorData] = useState();
+
+  const [notificationsLength, setNotificationsLength] = useState(0);
 
   const navigate = useNavigate();
 
@@ -53,12 +56,18 @@ const HomePage = (props) => {
     setColorData(colors);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadHomePage = async () => {
     const res = await baseRequest.post("/home", {});
     const status = userAuth.control(res);
     if (status) {
       loadProducts(res);
       loadColors();
+      loadNotifications();
       setUser(res.data.user[0]);
     } else {
       message.error("You should sign in again!");
@@ -99,7 +108,7 @@ const HomePage = (props) => {
               defaultSelectedKeys={"1"}
               theme="dark"
               mode="inline"
-              items={menu.items(true)}
+              items={menu.items(notificationsLength)}
               onClick={(item) => {
                 setPageIndex({ key: item.key });
               }}

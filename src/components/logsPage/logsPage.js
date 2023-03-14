@@ -11,6 +11,7 @@ import {
   message,
 } from "antd";
 import { getTechnicianLogs, getQRLogs } from "../../controllers/logsController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import MenuSelector from "../../utils/menuSelector";
 import * as menu from "../menu";
@@ -30,6 +31,8 @@ const LogsPage = (props) => {
 
   const [pageIndex, setPageIndex] = useState(0);
 
+  const [notificationsLength, setNotificationsLength] = useState(0);
+
   const navigate = useNavigate();
 
   const loadTechnicianLogs = async (res) => {
@@ -42,12 +45,18 @@ const LogsPage = (props) => {
     setQRLogs(logs);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadLogsPage = async () => {
     const res = await baseRequest.post("/logs/qr", {});
     const status = userAuth.control(res);
     if (status) {
       loadQRLogs(res);
       loadTechnicianLogs();
+      loadNotifications();
     } else {
       message.error("You should sign in again!");
       navigate("/login");
@@ -132,7 +141,7 @@ const LogsPage = (props) => {
               defaultSelectedKeys={"5"}
               theme="dark"
               mode="inline"
-              items={menu.items(true)}
+              items={menu.items(notificationsLength)}
               onClick={(item) => {
                 setPageIndex({ key: item.key });
               }}

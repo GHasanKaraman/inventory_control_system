@@ -19,6 +19,7 @@ import {
   deleteVendor,
   updateVendor,
 } from "../../controllers/vendorsController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";
@@ -35,6 +36,8 @@ const VendorsPage = (props) => {
   const [data, setData] = useState();
   const [pageIndex, setPageIndex] = useState(0);
 
+  const [notificationsLength, setNotificationsLength] = useState(0);
+
   const navigate = useNavigate();
 
   const loadVendors = async (res) => {
@@ -42,11 +45,17 @@ const VendorsPage = (props) => {
     setData(vendors);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadVendorsPage = async () => {
     const res = await baseRequest.post("/vendor", {});
     const status = userAuth.control(res);
     if (status) {
       loadVendors(res);
+      loadNotifications();
     } else {
       message.error("You should sign in again!");
       navigate("/login");
@@ -136,7 +145,7 @@ const VendorsPage = (props) => {
               defaultSelectedKeys={"7"}
               theme="dark"
               mode="inline"
-              items={menu.items(true)}
+              items={menu.items(notificationsLength)}
               onClick={(item) => setPageIndex({ key: item.key })}
             />
             <MenuSelector selectedIndex={pageIndex} />

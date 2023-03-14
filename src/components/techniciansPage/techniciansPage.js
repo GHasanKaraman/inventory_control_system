@@ -19,6 +19,7 @@ import {
   deleteTechnician,
   updateTechnician,
 } from "../../controllers/techniciansController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";
@@ -35,6 +36,8 @@ const TechniciansPage = (props) => {
   const [data, setData] = useState();
   const [pageIndex, setPageIndex] = useState(0);
 
+  const [notificationsLength, setNotificationsLength] = useState(0);
+
   const navigate = useNavigate();
 
   const loadTechnicians = async (res) => {
@@ -42,11 +45,17 @@ const TechniciansPage = (props) => {
     setData(technicians);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadTechniciansPage = async () => {
     const res = await baseRequest.post("/technician", {});
     const status = userAuth.control(res);
     if (status) {
       loadTechnicians(res);
+      loadNotifications();
     } else {
       message.error("You should sign in again!");
       navigate("/login");
@@ -136,7 +145,7 @@ const TechniciansPage = (props) => {
               defaultSelectedKeys={"4"}
               theme="dark"
               mode="inline"
-              items={menu.items(true)}
+              items={menu.items(notificationsLength)}
               onClick={(item) => setPageIndex({ key: item.key })}
             />
             <MenuSelector selectedIndex={pageIndex} />

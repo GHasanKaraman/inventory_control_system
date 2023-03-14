@@ -26,6 +26,7 @@ import {
   deleteRack,
   updateRack,
 } from "../../controllers/locationsController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import { EditableCell, EditableRow } from "../tableUtils";
 import MenuSelector from "../../utils/menuSelector";
@@ -45,6 +46,8 @@ const LocationsPage = (props) => {
 
   const [pageIndex, setPageIndex] = useState(0);
 
+  const [notificationsLength, setNotificationsLength] = useState(0);
+
   const navigate = useNavigate();
 
   const loadNonUsedLocations = async (res) => {
@@ -57,12 +60,18 @@ const LocationsPage = (props) => {
     setRacks(racks);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadLocationsPage = async () => {
     const res = await baseRequest.post("/location/nonused", {});
     const status = userAuth.control(res);
     if (status) {
       loadNonUsedLocations(res);
       loadRacks();
+      loadNotifications();
     } else {
       message.error("You should sign in again!");
       navigate("/login");
@@ -372,7 +381,7 @@ const LocationsPage = (props) => {
               defaultSelectedKeys={"6"}
               theme="dark"
               mode="inline"
-              items={menu.items(true)}
+              items={menu.items(notificationsLength)}
               onClick={(item) => {
                 setPageIndex({ key: item.key });
               }}

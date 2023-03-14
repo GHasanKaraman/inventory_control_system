@@ -27,6 +27,7 @@ import {
   deleteOrder,
 } from "../../controllers/ordersController";
 import { getLabels, tagRender } from "../../controllers/labelsController";
+import { getNotificationsLength } from "../../controllers/notificationsController";
 
 import OrderDetailsModal from "../orderDetailsModal/orderDetails";
 
@@ -55,6 +56,8 @@ const OrdersPage = (props) => {
 
   const [form] = Form.useForm();
 
+  const [notificationsLength, setNotificationsLength] = useState(0);
+
   const navigate = useNavigate();
 
   const loadLabels = async (res) => {
@@ -67,12 +70,18 @@ const OrdersPage = (props) => {
     setOrders(orders);
   };
 
+  const loadNotifications = async () => {
+    const length = await getNotificationsLength();
+    setNotificationsLength(length);
+  };
+
   const loadOrdersPage = async () => {
     const res = await baseRequest.post("/order", {});
     const status = userAuth.control(res);
     if (status) {
       loadLabels(res);
       loadOrders();
+      loadNotifications();
     } else {
       message.error("You should sign in again!");
       navigate("/login");
@@ -421,7 +430,7 @@ const OrdersPage = (props) => {
                 defaultSelectedKeys={"8"}
                 theme="dark"
                 mode="inline"
-                items={menu.items(true)}
+                items={menu.items(notificationsLength)}
                 onClick={(item) => {
                   setPageIndex({ key: item.key });
                 }}
