@@ -12,6 +12,7 @@ import GivePage from "../components/givePage/givePage";
 import RackPage from "../components/rackPage/rackPage";
 import ItemsPage from "../components/itemsPage/itemsPage";
 import VendorsPage from "../components/vendorsPage/vendorsPage";
+import NotificationsPage from "../components/notificationsPage/notificationsPage";
 
 const Pages = () => {
   return (
@@ -27,6 +28,7 @@ const Pages = () => {
         <Route exact path="/locations" element={<LocationsPage />} />
         <Route exact path="/vendors" element={<VendorsPage />} />
         <Route exact path="/orders" element={<OrdersPage />} />
+        <Route exact path="/notifications" element={<NotificationsPage />} />
         <Route exact path="/qr/:id" element={<GivePage />} />
         <Route exact path="/rack/:id" element={<RackPage />} />
       </Routes>

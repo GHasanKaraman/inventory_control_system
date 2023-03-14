@@ -164,7 +164,7 @@ const ItemsPage = (props) => {
               defaultSelectedKeys={"2"}
               theme="dark"
               mode="inline"
-              items={menu.items}
+              items={menu.items(true)}
               onClick={(item) => {
                 setPageIndex({ key: item.key });
               }}

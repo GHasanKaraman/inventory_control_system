@@ -136,7 +136,7 @@ const TechniciansPage = (props) => {
               defaultSelectedKeys={"4"}
               theme="dark"
               mode="inline"
-              items={menu.items}
+              items={menu.items(true)}
               onClick={(item) => setPageIndex({ key: item.key })}
             />
             <MenuSelector selectedIndex={pageIndex} />

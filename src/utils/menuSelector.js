@@ -37,6 +37,9 @@ const MenuSelector = (props) => {
         navigate("/orders");
         break;
       case 9:
+        navigate("/notifications");
+        break;
+      case 10:
         logout();
         navigate("/login");
         break;
